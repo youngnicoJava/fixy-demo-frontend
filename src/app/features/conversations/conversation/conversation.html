@@ -1,0 +1,182 @@
+<div class="conversation-panel">
+  <!-- HEADER -->
+  <header class="conversation-header">
+
+  <!-- 3.2 — Botón volver (solo mobile) -->
+  <button
+    type="button"
+    class="mobile-back-button"
+    (click)="goBack()"
+    aria-label="Volver a la lista"
+  >
+    <lucide-icon [img]="icons.ArrowLeft" [size]="20" />
+  </button>
+
+  <div class="conversation-heading">
+    <span class="conversation-label">Conversación</span>
+    <h1>{{ conversationTitle() }}</h1>
+  </div>
+
+  @if (conversation(); as currentConversation) {
+    <div
+      class="conversation-status"
+      [class.closed]="!isOpen()"
+    >
+      @if (isOpen()) {
+        <span class="status-dot"></span>
+        Abierta
+      } @else {
+        <lucide-icon [img]="icons.LockKeyhole" [size]="14" />
+        Cerrada
+      }
+    </div>
+  }
+</header>
+  <!-- BODY -->
+  @if (loading()) {
+
+  <section class="conversation-state">
+    <div class="loading-spinner"></div>
+    <p>Cargando conversación...</p>
+  </section>
+
+  } @else if (error()) {
+
+  <section class="conversation-state error-state">
+    <h2>No pudimos cargar la conversación</h2>
+    <p>Probá nuevamente en unos segundos.</p>
+  </section>
+
+  } @else {
+
+ <main class="conversation-container">
+
+  @if (conversationContextMessage(); as contextMessage) {
+    <div class="conversation-system-message">
+      <lucide-icon [img]="icons.CornerDownRight" [size]="15" />
+
+      <span>{{ contextMessage }}</span>
+    </div>
+  }
+
+  @if(conversation()?.serviceRequestId;as requestId){
+    <details class="commercial-context" open><summary>Contratación · presupuesto y pago</summary><app-contract-panel [requestId]="requestId" [compact]="true" /></details>
+  }
+  <section class="messages-panel">
+      <div class="messages-list">
+        @if (messages().length === 0) {
+
+        <div class="empty-messages">
+          <div class="empty-icon">
+            <lucide-icon [img]="icons.Send" [size]="22" />
+          </div>
+
+          <h2>Iniciá la conversación</h2>
+          <p>Podés comunicarte con la otra persona desde acá.</p>
+        </div>
+
+        } @else { @for (message of messages(); track message.id) {
+
+        <article
+          class="message-row"
+          [class.own]="isOwnMessage(message)"
+          [class.deleted]="isDeletedMessage(message)"
+        >
+          <div class="message-content">
+            @if (!isOwnMessage(message)) {
+            <span class="sender-name">{{ message.senderName }}</span>
+            }
+
+            <div class="message-bubble">
+              @if (isDeletedMessage(message)) {
+              <span class="deleted-message">Mensaje eliminado</span>
+              } @else {
+              <p>{{ message.content }}</p>
+              }
+            </div>
+
+            <div class="message-meta">
+              <span>{{ formatMessageTime(message.createdAt) }}</span>
+
+              @if (isOwnMessage(message) && !isDeletedMessage(message)) {
+              <button
+                type="button"
+                class="delete-message-button"
+                (click)="deleteMessage(message)"
+                [disabled]="deletingMessageId() === message.id"
+                aria-label="Eliminar mensaje"
+              >
+                <lucide-icon [img]="icons.Trash2" [size]="13" />
+              </button>
+              }
+            </div>
+          </div>
+        </article>
+
+        } }
+
+        <!-- 3.1 — Ancla invisible para scroll al fondo -->
+<div #messagesEnd></div>
+      </div>
+
+      @if (!isOpen()) {
+
+      <div class="closed-banner">
+        <lucide-icon [img]="icons.LockKeyhole" [size]="17" />
+
+        <div>
+          <strong>Esta conversación está cerrada</strong>
+          <span> Podés consultar el historial, pero ya no se pueden enviar mensajes. </span>
+        </div>
+      </div>
+
+      } @else {
+
+      <div class="conversation-privacy">
+  <div class="privacy-icon">
+    <lucide-icon [img]="icons.LockKeyhole" [size]="16" />
+  </div>
+
+  <div class="privacy-content">
+    <strong>Conversación privada</strong>
+    <span>
+      Tus mensajes solo son visibles para las personas involucradas en este servicio.
+    </span>
+  </div>
+</div>
+
+<div class="composer">
+  <textarea
+    [value]="messageText()"
+    (input)="onMessageInput($event)"
+    (keydown)="onMessageKeydown($event)"
+    placeholder="Escribí un mensaje..."
+    rows="1"
+    [disabled]="sending()"
+    aria-label="Mensaje"
+  ></textarea>
+
+  <button
+    type="button"
+    class="send-button"
+    [disabled]="!canSend()"
+    (click)="sendMessage()"
+    aria-label="Enviar mensaje"
+  >
+    <lucide-icon [img]="icons.Send" [size]="18" />
+  </button>
+</div>
+
+<span class="composer-hint">
+  <span>Enter para enviar · Shift + Enter para nueva línea</span>
+  <span class="respect-hint">
+    Recorda mantener el respeto y la cordialidad con la otra persona.
+  </span>
+</span>
+
+      }
+    </section>
+  </main>
+
+  }
+</div>

@@ -1,0 +1,231 @@
+@use '../styles/variables' as fx;
+
+.modal-overlay {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(100%, 660px);
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid fx.$border;
+  border-radius: fx.$radius-lg;
+  background: fx.$white;
+  color: fx.$text-main;
+  box-shadow: fx.$shadow-lg;
+  overflow-wrap: anywhere;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid fx.$border;
+
+  > div {
+    flex: 1;
+    min-width: 0;
+  }
+  h2 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    line-height: 1.25;
+    letter-spacing: -0.03em;
+  }
+  p {
+    margin: 0;
+    color: fx.$text-secondary;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  color: fx.$primary;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.close-btn {
+  display: inline-flex;
+  flex: 0 0 44px;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -8px -8px 0 0;
+  border: 0;
+  border-radius: fx.$radius-md;
+  background: transparent;
+  color: fx.$text-secondary;
+  cursor: pointer;
+  &:hover {
+    background: fx.$background;
+    color: fx.$text-main;
+  }
+}
+
+.modal-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px 28px;
+  scrollbar-gutter: stable;
+}
+
+.info-section {
+  & + & {
+    margin-top: 24px;
+  }
+  h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    line-height: 1.4;
+    font-weight: 700;
+  }
+  p,
+  li {
+    color: fx.$text-secondary;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  p {
+    margin: 0;
+  }
+  p + p {
+    margin-top: 10px;
+  }
+  ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+  li + li {
+    margin-top: 8px;
+  }
+  li::marker {
+    color: fx.$primary;
+  }
+}
+
+.protection {
+  padding: 16px;
+  border: 1px solid #d5e2fa;
+  border-radius: fx.$radius-md;
+  background: fx.$primary-light;
+  h3 {
+    color: fx.$primary;
+  }
+  p {
+    color: fx.$text-main;
+  }
+}
+
+.modal-footer {
+  padding: 16px 28px 24px;
+  border-top: 1px solid fx.$border;
+  background: fx.$background;
+  p {
+    margin: 0 0 16px;
+    color: fx.$text-secondary;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  button {
+    min-height: 44px;
+    padding: 11px 18px;
+    border: 1px solid transparent;
+    border-radius: fx.$radius-md;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    cursor: pointer;
+    transition: background fx.$transition-fast;
+  }
+}
+
+.btn-primary {
+  background: fx.$primary;
+  color: fx.$white;
+  &:hover {
+    background: fx.$primary-dark;
+  }
+}
+
+.btn-secondary {
+  border-color: fx.$border !important;
+  background: fx.$white;
+  color: fx.$text-main;
+  &:hover {
+    background: fx.$border-light;
+  }
+}
+
+button:focus-visible,
+.modal-body:focus-visible {
+  outline: 2px solid fx.$primary;
+  outline-offset: 3px;
+}
+
+@media (max-width: 540px) {
+  .modal-overlay {
+    padding: 12px;
+  }
+  .modal {
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+    border-radius: 16px;
+  }
+  .modal-header {
+    padding: 20px 20px 16px;
+    gap: 8px;
+    h2 {
+      font-size: 22px;
+    }
+  }
+  .modal-body {
+    padding: 20px;
+  }
+  .modal-footer {
+    padding: 16px 20px 20px;
+  }
+  .modal-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-actions button {
+    transition: none;
+  }
+}

@@ -1,0 +1,246 @@
+@use './styles/contracting';
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+@import 'intl-tel-input/dist/css/intlTelInput.css';
+
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --color-primary: #000080;
+  --color-primary-dark: #0000a0;
+
+  --color-text: #0f172a;
+  --color-secondary: #64748b;
+  --color-border: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #fff;
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+input,
+button {
+  font: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+.container {
+  width: min(1200px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+/* =========================
+   INTL TEL INPUT
+========================= */
+
+.iti {
+  width: 100%;
+}
+
+.iti input {
+  width: 100% !important;
+
+  height: 52px !important;
+
+  padding: 0.95rem 1rem 0.95rem 5rem !important;
+
+  border: 1px solid var(--color-border) !important;
+
+  border-radius: 14px !important;
+
+  font-size: 0.95rem !important;
+
+  background: white !important;
+
+  transition: 0.2s;
+}
+
+.iti input:focus {
+  outline: none !important;
+
+  border-color: var(--color-primary) !important;
+
+  box-shadow: 0 0 0 4px rgba(31, 0, 214, 0.12) !important;
+}
+
+.iti__selected-country {
+  padding-left: 12px !important;
+
+  border-radius: 14px 0 0 14px !important;
+}
+
+.iti__selected-country-primary {
+  height: 52px !important;
+}
+
+.iti__country-list {
+  border: 1px solid var(--color-border) !important;
+
+  border-radius: 14px !important;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+.iti__country {
+  padding: 0.75rem 1rem !important;
+}
+
+.iti__country:hover {
+  background: #f8fafc !important;
+}
+
+.iti__search-input {
+  border-radius: 10px !important;
+
+  border: 1px solid var(--color-border) !important;
+
+  padding: 0.65rem 0.8rem !important;
+}
+
+/* =========================
+   DATEPICKER
+========================= */
+
+//type
+
+.fixy-date-field {
+  width: 100%;
+}
+
+.fixy-date-field .mat-mdc-text-field-wrapper {
+  min-height: 60px !important;
+}
+
+.fixy-date-field .mat-mdc-form-field-infix {
+  min-height: 60px !important;
+  padding-top: 18px !important;
+  padding-bottom: 18px !important;
+}
+
+.fixy-date-field input {
+  font-size: 1rem !important;
+}
+
+.mat-mdc-text-field-wrapper {
+  border-radius: 14px !important;
+  border: 1px solid var(--color-border) !important;
+  background: white !important;
+}
+
+.mdc-notched-outline {
+  display: none !important;
+}
+
+.mat-mdc-form-field-infix {
+  border: none !important;
+}
+
+.mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 4px rgba(31, 0, 214, 0.12);
+}
+
+.iti input {
+  padding-left: 104px !important;
+}
+
+.fixy-date-field .mdc-line-ripple {
+  display: none !important;
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 700ms ease,
+    transform 700ms ease;
+}
+
+.scroll-reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+/* The demo strip stays visible above the existing fixed navigation. */
+app-demo-bar {display:block;position:sticky;top:0;z-index:1101;}
+.navbar {top:var(--demo-bar-height,72px)!important;}
+
+
+.app-container:has(> .page-content.managed-layout) > app-navbar {top:var(--demo-bar-height,72px);}
+.app-container:has(> .page-content.managed-layout) > app-navbar .navbar {top:0!important;}
+@media(max-width:640px){
+ app-navbar .navbar .navbar-inner{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;padding:0 12px;}
+ app-navbar .navbar .info-header{grid-column:1;grid-row:1;}
+ app-navbar .navbar app-address-selector{grid-column:2;grid-row:1;min-width:0;}
+ app-navbar .navbar .user-section{grid-column:3;grid-row:1;gap:8px;}
+ app-navbar .navbar .auth-section{grid-column:1/-1;grid-row:3;justify-content:center;}
+ app-navbar .navbar .search-bar{grid-column:1/-1;grid-row:2;width:100%;min-width:0;margin:0;height:58px;}
+ app-navbar .navbar .search-field{min-width:0;padding:6px 10px;}
+ app-navbar .navbar .search-label,app-navbar .navbar .search-value,app-navbar .navbar .search-input input{font-size:12px;}
+ app-navbar .navbar .search-value{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ app-navbar .navbar .search-button{flex:0 0 38px;}
+ app-navbar .navbar .address-button{max-width:100%;padding:4px;gap:4px;}
+ app-navbar .navbar .address-info{min-width:0;max-width:110px;}
+ app-navbar .navbar .address-info span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+}
+

@@ -1,0 +1,127 @@
+@if (open()) {
+  <div class="modal-overlay" (click)="close()">
+    <div class="modal" (click)="stopPropagation($event)">
+      <!-- Header -->
+      <div class="modal-header">
+        <h2>
+          {{ mode() === 'edit' ? 'Editar direccion' : 'Agregar direccion' }}
+        </h2>
+
+        <button
+          type="button"
+          class="close-btn"
+          (click)="close()"
+          aria-label="Cerrar modal"
+        >
+          <lucide-angular [img]="XIcon" size="20" aria-hidden="true"></lucide-angular>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="addressForm" (ngSubmit)="save()">
+        <!-- Selector de tipo de label -->
+        <div class="form-group">
+          <label>Tipo de direccion</label>
+
+          <div class="label-options">
+            @for (option of labelOptions; track option.value) {
+              <button
+                type="button"
+                class="label-option"
+                [class.active]="selectedLabelType() === option.value"
+                (click)="selectLabelType(option.value)"
+              >
+                <lucide-angular
+                  [img]="option.icon"
+                  size="18"
+                  aria-hidden="true"
+                ></lucide-angular>
+                {{ option.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Custom label -->
+        @if (selectedLabelType() === 'other') {
+          <div class="form-group">
+            <label for="customLabel">Nombre personalizado</label>
+            <input
+              id="customLabel"
+              type="text"
+              formControlName="customLabel"
+              placeholder="Ej: Oficina central"
+              class="form-input"
+            />
+          </div>
+        }
+
+        <!-- Buscador de direccion -->
+        <div class="form-group">
+          <label>Direccion</label>
+
+          <!--
+            FIX: sin #autocomplete (ya no se usa ViewChild).
+            FIX: [query] bindea el input al selectedLocation.
+            El autocomplete refleja el valor automaticamente.
+          -->
+          <app-address-autocomplete
+            [query]="selectedLocation()?.address ?? ''"
+            (locationSelected)="onLocationSelected($event)"
+            (openMapPickerEvent)="openMapPicker()"
+          ></app-address-autocomplete>
+        </div>
+
+        <!-- Mapa -->
+        <div class="form-group" #mapContainer>
+          <label>Selecciona tu ubicacion en el mapa</label>
+
+          <app-map
+            [latitude]="selectedLocation()?.latitude || -34.6037"
+            [longitude]="selectedLocation()?.longitude || -58.3816"
+            (locationSelected)="onMapClick($event)"
+          ></app-map>
+
+          <small class="hint">Hace click en el mapa para ajustar la ubicacion</small>
+        </div>
+
+        <!-- Piso y Departamento -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="floor">Piso (opcional)</label>
+            <input
+              id="floor"
+              type="text"
+              formControlName="floor"
+              placeholder="Piso"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="apartment">Departamento (opcional)</label>
+            <input
+              id="apartment"
+              type="text"
+              formControlName="apartment"
+              placeholder="Depto / Oficina"
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="close()">
+            Cancelar
+          </button>
+
+          <!-- FIX: isFormValid ahora es computed, se llama con parentesis. -->
+          <button type="submit" class="btn-primary" [disabled]="!isFormValid()">
+            {{ mode() === 'edit' ? 'Actualizar' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

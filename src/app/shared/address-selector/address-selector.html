@@ -1,0 +1,78 @@
+<div class="address-selector">
+  <button
+    type="button"
+    class="address-button"
+    (click)="toggle()"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="true"
+  >
+    <lucide-icon [img]="MapPinIcon" size="22" aria-hidden="true"></lucide-icon>
+
+    <div class="address-info">
+      <strong>Mis direcciones:</strong>
+      <small>{{ activeAddress()?.address || 'Seleccionar direccion' }}</small>
+    </div>
+
+    <lucide-icon
+      [img]="ChevronDown"
+      size="18"
+      [class.rotated]="open()"
+      aria-hidden="true"
+    ></lucide-icon>
+  </button>
+
+  @if (open()) {
+    <div class="dropdown" role="menu">
+      <p class="title">Mis direcciones</p>
+
+      @for (address of addresses(); track address.id) {
+        <div
+          class="address-item"
+          [class.active]="activeAddress()?.id === address.id"
+        >
+          <button
+            type="button"
+            class="address-main"
+            (click)="selectAddress(address)"
+          >
+            <strong>
+              {{ address.label }}
+
+              @if (activeAddress()?.id === address.id) {
+                <span class="active-badge">Activa</span>
+              }
+            </strong>
+
+            <span>{{ address.address }}</span>
+          </button>
+
+          <div class="address-actions">
+            <button
+              type="button"
+              class="icon-btn"
+              (click)="editAddress(address, $event)"
+              [attr.aria-label]="'Editar direccion ' + address.label"
+            >
+              <lucide-icon [img]="PencilIcon" size="16" aria-hidden="true" />
+            </button>
+
+            <button
+              type="button"
+              class="icon-btn danger"
+              (click)="deleteAddress(address, $event)"
+              [attr.aria-label]="'Eliminar direccion ' + address.label"
+            >
+              <lucide-icon [img]="TrashIcon" size="16" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <p class="empty-message">No tenes direcciones guardadas todavia.</p>
+      }
+
+      <button type="button" class="add-button" (click)="addAddress()">
+        + Agregar direccion
+      </button>
+    </div>
+  }
+</div>

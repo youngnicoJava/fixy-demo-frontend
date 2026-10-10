@@ -1,0 +1,146 @@
+<footer class="footer">
+  <div class="footer-container">
+    <!-- Columna 1: Sobre Fixy -->
+    <div class="footer-column">
+      <h4>Sobre Fixy</h4>
+      <ul>
+        <li><a routerLink="/about">Quiénes somos</a></li>
+        <li><a routerLink="/how-it-works">Cómo funciona</a></li>
+        <li><a routerLink="/mission">Misión y valores</a></li>
+        <li><a routerLink="/blog">Blog / Novedades</a></li>
+        <li><a routerLink="/careers">Trabajá con nosotros</a></li>
+      </ul>
+    </div>
+
+    <!-- Columna 2: Para clientes -->
+    <div class="footer-column">
+      <h4>Para clientes</h4>
+      <ul>
+        <li><a routerLink="/how-to-hire">Cómo contratar un servicio</a></li>
+        <li><a routerLink="/security">Seguridad y confianza</a></li>
+        <li><a routerLink="/faq">Preguntas frecuentes</a></li>
+        <li><a routerLink="/cancel-service">Cancelar un servicio</a></li>
+        <li><a routerLink="/cancellation">Botón de arrepentimiento</a></li>
+        <li>
+          <a routerLink="/demo-info" target="_blank"
+            >Defensa del consumidor</a
+          >
+        </li>
+        <li><a routerLink="/rate-service">Calificar un servicio</a></li>
+      </ul>
+    </div>
+
+    <!-- Columna 3: Para trabajadores -->
+    <div class="footer-column">
+      <h4>Para trabajadores</h4>
+      <ul>
+        <li><a routerLink="/become-worker">Unite a Fixy</a></li>
+        <li><a routerLink="/worker-benefits">Beneficios de ser trabajador</a></li>
+        <li><a routerLink="/worker-insurance">Seguro y cobertura</a></li>
+        <li><a routerLink="/worker-payments">Cómo cobrar</a></li>
+        <li><a routerLink="/worker-help">Centro de ayuda</a></li>
+        <li><a routerLink="/cancel-subscription">Cancelar suscripción</a></li>
+      </ul>
+    </div>
+
+    <!-- Columna 4: Ayuda / Soporte + Legal -->
+    <div class="footer-column">
+      <h4>Ayuda</h4>
+      <ul>
+        <li><a routerLink="/help">Centro de ayuda</a></li>
+        <li><a routerLink="/contact">Contacto</a></li>
+        <li><a routerLink="/report-problem">Reportar un problema</a></li>
+        <li><a routerLink="/cancellations">Cancelaciones y reembolsos</a></li>
+      </ul>
+
+      <h4 class="legal-title">Legal</h4>
+      <ul>
+        <li><a routerLink="/terms">Términos y condiciones</a></li>
+        <li><a routerLink="/privacy">Política de privacidad</a></li>
+        <li><a routerLink="/cookies">Política de cookies</a></li>
+        <li>
+          <a routerLink="/demo-info" target="_blank"
+            >Defensa del consumidor</a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Inversores -->
+  <div class="investors-bar">
+    <div class="investors-content">
+      <h4>Información para inversores</h4>
+      <ul>
+        <li><a routerLink="/investors">Información financiera</a></li>
+        <li><a routerLink="/investors/reports">Reportes trimestrales</a></li>
+        <li><a routerLink="/investors/opportunities">Oportunidades de inversión</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Contacto y redes -->
+  <div class="contact-bar">
+    <div class="contact-content">
+      <div class="contact-info">
+        <div class="contact-item">
+          <lucide-angular [img]="MailIcon" size="16"></lucide-angular>
+          <a routerLink="/demo-info">{{ companyData.email }}</a>
+        </div>
+        <div class="contact-item">
+          <lucide-angular [img]="PhoneIcon" size="16"></lucide-angular>
+          <a routerLink="/demo-info">{{ companyData.phone }}</a>
+        </div>
+        <div class="contact-item">
+          <lucide-angular [img]="MapPinIcon" size="16"></lucide-angular>
+          <span>{{ companyData.address }}</span>
+        </div>
+      </div>
+      <div class="social-links">
+        @for(social of socialLinks; track social.name) {
+        <a
+          [href]="social.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="{{ social.name }}"
+        >
+          <lucide-angular [img]="social.icon" size="18"></lucide-angular>
+        </a>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer bottom -->
+  <div class="footer-bottom">
+    <div class="bottom-content">
+      <p>&copy; {{ currentYear }} Fixy. Todos los derechos reservados.</p>
+      <div class="bottom-links">
+        <a routerLink="/terms">Términos y condiciones</a>
+        <a routerLink="/privacy">Política de privacidad</a>
+        <a routerLink="/cookies">Política de cookies</a>
+        <a routerLink="/demo-info" target="_blank"
+          >Defensa del consumidor</a
+        >
+      </div>
+    </div>
+
+    <!-- Datos de la empresa -->
+    <div class="company-data">
+      <div class="company-details">
+        <span
+          ><lucide-angular [img]="Building2Icon" size="14"></lucide-angular> {{ companyData.name
+          }}</span
+        >
+        <span>CUIT: {{ companyData.cuit }}</span>
+        <span>{{ companyData.inscription }}</span>
+        <span>{{ companyData.afip }}</span>
+        <span
+          ><lucide-angular [img]="MapPinIcon" size="14"></lucide-angular> {{ companyData.address
+          }}</span
+        >
+      </div>
+    </div>
+  </div>
+</footer>
+

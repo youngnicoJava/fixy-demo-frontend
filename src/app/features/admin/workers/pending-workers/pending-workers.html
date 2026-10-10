@@ -1,0 +1,149 @@
+<section class="admin-page">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">
+        ADMINISTRACIÓN HIJOS DE PUTA ACA MANDO YO GRACIAS ADMINGUARD NADIE PUEDE VER ESTO JAJA SOLO
+        YO
+      </span>
+
+      <h1>Trabajadores pendientes</h1>
+
+      <p>Revisá los perfiles profesionales que esperan aprobación.</p>
+    </div>
+
+    <button
+      type="button"
+      class="secondary-button"
+      [disabled]="loading()"
+      (click)="loadPendingWorkers()"
+    >
+      <lucide-icon [img]="icons.RefreshCw" [size]="17" [strokeWidth]="2" aria-hidden="true" />
+
+      <span>Actualizar</span>
+    </button>
+  </header>
+
+  @if (loading()) {
+
+  <div class="state state--loading">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Cargando trabajadores pendientes...</p>
+  </div>
+
+  } @else if (error()) {
+
+  <div class="state state--error">
+    <div class="state-icon">!</div>
+
+    <h2>No pudimos cargar los trabajadores</h2>
+
+    <p>Ocurrió un problema al obtener las solicitudes pendientes de revisión.</p>
+
+    <button type="button" class="primary-button" (click)="loadPendingWorkers()">
+      Intentar nuevamente
+    </button>
+  </div>
+
+  } @else if (workers().length === 0) {
+
+  <div class="empty-state">
+    <div class="empty-icon">
+      <lucide-icon [img]="icons.Check" [size]="24" [strokeWidth]="2" aria-hidden="true" />
+    </div>
+
+    <h2>No hay trabajadores pendientes</h2>
+
+    <p>Todos los perfiles profesionales fueron revisados.</p>
+  </div>
+
+  } @else {
+
+  <div class="results-header">
+    <span>
+      {{ workers().length }} {{ workers().length === 1 ? 'perfil pendiente' : 'perfiles pendientes'
+      }}
+    </span>
+  </div>
+
+  <div class="workers-grid">
+    @for (worker of workers(); track worker.id) {
+
+    <article class="worker-card">
+      <div class="worker-card__header">
+        <div class="worker-avatar">{{ worker.fullName.charAt(0).toUpperCase() }}</div>
+
+        <div class="worker-identity">
+          <h2>{{ worker.fullName }}</h2>
+
+          <span class="worker-status"> {{ worker.status }} </span>
+        </div>
+      </div>
+
+      <div class="worker-card__body">
+        <div class="worker-detail">
+          <span class="detail-label"> Categorías </span>
+
+          <div class="categories">
+            @for ( category of worker.categories; track category ) {
+            <span class="category"> {{ getCategoryLabel(category) }} </span>
+            }
+          </div>
+        </div>
+
+        <div class="worker-detail">
+          <span class="detail-label"> Dirección </span>
+
+          <p>{{ worker.address }}</p>
+        </div>
+
+        <div class="worker-detail">
+          <span class="detail-label"> Descripción </span>
+
+          <p>{{ worker.description || 'Sin descripción.' }}</p>
+        </div>
+
+        <div class="worker-meta">
+          <span> Certificado: {{ worker.hasCertificate ? 'Sí' : 'No' }} </span>
+
+          <span> ID #{{ worker.id }} </span>
+        </div>
+      </div>
+
+      <footer class="worker-card__actions">
+        <button
+          type="button"
+          class="danger-button"
+          [disabled]="isProcessing(worker.id)"
+          (click)="rejectWorker(worker.id)"
+        >
+          @if (isProcessing(worker.id)) {
+          <span class="button-spinner"></span>
+          } @else {
+          <lucide-icon [img]="icons.X" [size]="17" [strokeWidth]="2" aria-hidden="true" />
+          }
+
+          <span>Rechazar</span>
+        </button>
+
+        <button
+          type="button"
+          class="approve-button"
+          [disabled]="isProcessing(worker.id)"
+          (click)="approveWorker(worker.id)"
+        >
+          @if (isProcessing(worker.id)) {
+          <span class="button-spinner"></span>
+          } @else {
+          <lucide-icon [img]="icons.Check" [size]="17" [strokeWidth]="2" aria-hidden="true" />
+          }
+
+          <span>Aprobar</span>
+        </button>
+      </footer>
+    </article>
+
+    }
+  </div>
+
+  }
+</section>

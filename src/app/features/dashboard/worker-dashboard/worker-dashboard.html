@@ -1,0 +1,516 @@
+<section class="dashboard">
+  @if (loading()) {
+    <div class="dashboard-state dashboard-state--loading">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Cargando tu dashboard...</p>
+    </div>
+  } @else if (error()) {
+    <div class="dashboard-state dashboard-state--error">
+      <div class="state-icon" aria-hidden="true">!</div>
+      <h2>No pudimos cargar tu dashboard</h2>
+      <p>Ocurrio un problema al obtener tu informacion. Intenta nuevamente.</p>
+      <button type="button" class="primary-button" (click)="retry()">
+        Intentar nuevamente
+      </button>
+    </div>
+  } @else {
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    @if(profile()?.verified){<app-context-hint hintKey="worker_dashboard_intro_v1" title="Tu próximo trabajo empieza acá" text="Encontrá oportunidades de tus categorías, enviá propuestas y coordiná con el cliente. Confirmá el alcance mediante un presupuesto y esperá el pago protegido antes de iniciar el trabajo." />}
+    <header class="dashboard-header">
+      <div class="welcome">
+        <div class="welcome__identity">
+          @if (profile()?.profilePhotoUrl; as photoUrl) {
+            <img
+              class="worker-avatar"
+              [src]="photoUrl"
+              [alt]="'Foto de ' + (profile()?.fullName ?? 'profesional')"
+            />
+          } @else {
+            <div class="worker-avatar worker-avatar--placeholder" aria-hidden="true">
+              <lucide-icon [img]="icons.Wrench" [size]="22" [strokeWidth]="1.9" />
+            </div>
+          }
+
+          <div>
+            <span class="eyebrow">PANEL PROFESIONAL</span>
+            <h1>Hola de nuevo, {{ firstName() }}.</h1>
+          </div>
+        </div>
+
+        <p>Gestiona tus servicios, propuestas y encontra nuevas oportunidades de trabajo.</p>
+      </div>
+
+      <button type="button" class="primary-button" (click)="openOpportunities()">
+        <lucide-icon [img]="icons.Search" [size]="18" [strokeWidth]="2.2" aria-hidden="true" />
+        <span>Buscar trabajos</span>
+      </button>
+    </header>
+
+    <!-- =====================================================
+         SUMMARY
+         ===================================================== -->
+
+    <section class="stats-grid" aria-label="Resumen profesional">
+      <article class="stat-card">
+        <div class="stat-icon">
+          <lucide-icon [img]="icons.Star" [size]="21" [strokeWidth]="2" aria-hidden="true" />
+        </div>
+        <div>
+          <span class="stat-label">Reputacion</span>
+          <strong class="stat-value">{{ profile()?.rating ?? '—' }}</strong>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon">
+          <lucide-icon [img]="icons.CheckCircle" [size]="21" [strokeWidth]="2" aria-hidden="true" />
+        </div>
+        <div>
+          <span class="stat-label">Completados</span>
+          <strong class="stat-value">{{ completedRequests().length }}</strong>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon">
+          <lucide-icon [img]="icons.ClipboardList" [size]="21" [strokeWidth]="2" aria-hidden="true" />
+        </div>
+        <div>
+          <span class="stat-label">Mis propuestas</span>
+          <strong class="stat-value">{{ myProposals().length }}</strong>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon">
+          <lucide-icon [img]="icons.ShieldCheck" [size]="21" [strokeWidth]="2" aria-hidden="true" />
+        </div>
+        <div>
+          <span class="stat-label">Estado profesional</span>
+          <strong class="stat-value stat-value--small" [attr.data-worker-status]="profile()?.status">
+            {{ workerStatusLabel() }}
+          </strong>
+        </div>
+      </article>
+    </section>
+
+    <!-- =====================================================
+         ACTIVE SERVICE
+         ===================================================== -->
+
+    <section class="dashboard-section">
+      <div class="section-header">
+        <div>
+          @if (activeService()?.status === ServiceRequestStatus.MATCHED) {
+            <span class="eyebrow">SERVICIO ASIGNADO</span>
+            <h2>Servicio asignado</h2>
+          } @else {
+            <span class="eyebrow">SERVICIO ACTUAL</span>
+            <h2>Trabajo en curso</h2>
+          }
+        </div>
+      </div>
+
+      @if (activeService(); as request) {
+        <article
+          class="active-service"
+          tabindex="0"
+          role="button"
+          (click)="openRequest(request.id)"
+          (keydown.enter)="openRequest(request.id)"
+          (keydown.space)="openRequest(request.id)"
+        >
+          <div class="active-service__main">
+            <div class="request-card__top">
+              <span class="category">
+                {{ getCategoryLabel(request.category) }}
+              </span>
+
+              <span class="status" [attr.data-status]="request.status">
+                <!-- FIX: usamos STATUS_LABELS en vez de getStatusLabel() -->
+                {{ STATUS_LABELS[request.status] }}
+              </span>
+            </div>
+
+            <h3>{{ request.title }}</h3>
+            <p>{{ request.description }}</p>
+
+            <div class="request-card__meta">
+              <span>{{ request.address }}</span>
+            </div>
+
+            @if (request.status === ServiceRequestStatus.MATCHED) {
+              <div class="active-service__action">
+                <span>El cliente te selecciono para este servicio.</span>
+                <button
+                  type="button"
+                  class="primary-button"
+                  (click)="$event.stopPropagation(); openRequest(request.id)"
+                >
+                  Empezar servicio
+                </button>
+              </div>
+            } @else {
+              <div class="active-service__action">
+                <span>Servicio en progreso.</span>
+                <button
+                  type="button"
+                  class="primary-button"
+                  (click)="$event.stopPropagation(); openRequest(request.id)"
+                >
+                  Ver trabajo
+                </button>
+              </div>
+            }
+          </div>
+
+          <lucide-icon
+            class="active-service__arrow"
+            [img]="icons.ArrowRight"
+            [size]="21"
+            [strokeWidth]="2"
+            aria-hidden="true"
+          />
+        </article>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <lucide-icon [img]="icons.Wrench" [size]="26" [strokeWidth]="1.9" aria-hidden="true" />
+          </div>
+          <h3>No tenes servicios asignados</h3>
+          <p>Cuando un cliente te seleccione para un trabajo, va a aparecer aca.</p>
+
+          <button type="button" class="primary-button" (click)="openOpportunities()">
+            <lucide-icon [img]="icons.Search" [size]="18" [strokeWidth]="2.2" aria-hidden="true" />
+            <span>Explorar solicitudes</span>
+          </button>
+        </div>
+      }
+    </section>
+
+    <!-- =====================================================
+         MY SERVICE OFFERINGS
+         ===================================================== -->
+
+    <section class="dashboard-section">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">MIS SERVICIOS</span>
+          <h2>Lo que ofreces</h2>
+        </div>
+
+        <button type="button" class="primary-button" (click)="createServiceOffering()">
+          <lucide-icon [img]="icons.Wrench" [size]="18" [strokeWidth]="2.2" aria-hidden="true" />
+          <span>Publicar servicio</span>
+        </button>
+      </div>
+
+      @if (hasServiceOfferings()) {
+        <div class="requests-grid">
+          @for (offering of serviceOfferings(); track offering.id) {
+            <article class="service-card">
+              @if (offering.imageUrls.length > 0) {
+                <img
+                  class="service-card__image"
+                  [src]="offering.imageUrls[0]"
+                  [alt]="offering.title"
+                />
+              } @else {
+                <div class="service-card__image service-card__image--placeholder" aria-hidden="true">
+                  <lucide-icon [img]="icons.Wrench" [size]="28" [strokeWidth]="1.8" />
+                </div>
+              }
+
+              <div class="service-card__body">
+                <div class="request-card__top">
+                  <span class="category">{{ getCategoryLabel(offering.category) }}</span>
+                  <span class="status" [attr.data-active]="offering.active">
+                    {{ offering.active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </div>
+
+                <h3>{{ offering.title }}</h3>
+                <p class="description">{{ offering.description }}</p>
+
+                <div class="service-card__worker">
+                  @if (offering.workerProfilePhotoUrl) {
+                    <img
+                      [src]="offering.workerProfilePhotoUrl"
+                      [alt]="offering.workerFullName"
+                    />
+                  }
+                  <span>{{ offering.workerFullName }}</span>
+                </div>
+
+                <div class="service-card__meta">
+                  @if (offering.basePrice !== null) {
+                    <span>Desde ${{ offering.basePrice }}</span>
+                  } @else {
+                    <span>Precio a consultar</span>
+                  }
+
+                  <!-- FIX: usamos PRICE_TYPE_LABELS en vez de getPriceTypeLabel() -->
+                  <span>{{ PRICE_TYPE_LABELS[offering.priceType] }}</span>
+                </div>
+
+                <div class="service-card__actions">
+                  <button
+                    type="button"
+                    class="text-button"
+                    (click)="editServiceOffering(offering.id)"
+                  >
+                    Editar
+                  </button>
+
+                  @if (offering.active) {
+                    <button
+                      type="button"
+                      class="text-button"
+                      (click)="deactivateServiceOffering(offering.id)"
+                    >
+                      Desactivar
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="text-button"
+                      (click)="activateServiceOffering(offering.id)"
+                    >
+                      Activar
+                    </button>
+                  }
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <lucide-icon [img]="icons.Wrench" [size]="26" [strokeWidth]="1.9" aria-hidden="true" />
+          </div>
+          <h3>Todavia no publicaste ningun servicio</h3>
+          <p>Mostra lo que sabes hacer, defini tus precios y empeza a recibir oportunidades.</p>
+
+          <button type="button" class="primary-button" (click)="createServiceOffering()">
+            <lucide-icon [img]="icons.Wrench" [size]="18" [strokeWidth]="2.2" aria-hidden="true" />
+            <span>Publicar mi primer servicio</span>
+          </button>
+        </div>
+      }
+    </section>
+
+    <!-- =====================================================
+         OPPORTUNITIES
+         ===================================================== -->
+
+    <section class="dashboard-section">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">OPORTUNIDADES</span>
+          <h2>Solicitudes para vos</h2>
+        </div>
+
+        <button type="button" class="text-button" (click)="openOpportunities()">
+          Ver todas
+        </button>
+      </div>
+
+      @if (hasOpportunities()) {
+        <div class="requests-grid">
+          @for (request of opportunities(); track request.id) {
+            <article
+              class="request-card"
+              tabindex="0"
+              role="button"
+              (click)="openRequest(request.id)"
+              (keydown.enter)="openRequest(request.id)"
+              (keydown.space)="openRequest(request.id)"
+            >
+              <div class="request-card__top">
+                <span class="category">{{ getCategoryLabel(request.category) }}</span>
+
+                <span class="status" [attr.data-status]="request.status">
+                  <!-- FIX: STATUS_LABELS -->
+                  {{ STATUS_LABELS[request.status] }}
+                </span>
+              </div>
+
+              <h3>{{ request.title }}</h3>
+              <p class="description">{{ request.description }}</p>
+
+              <div class="request-card__meta">
+                <span>{{ request.address }}</span>
+                <span>
+                  {{ request.proposals.length }}
+                  {{ request.proposals.length === 1 ? 'propuesta' : 'propuestas' }}
+                </span>
+              </div>
+
+              <lucide-icon
+                class="arrow"
+                [img]="icons.ArrowRight"
+                [size]="19"
+                [strokeWidth]="2"
+                aria-hidden="true"
+              />
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="empty-state empty-state--compact">
+          <div class="empty-icon">
+            <lucide-icon [img]="icons.Search" [size]="24" [strokeWidth]="1.9" aria-hidden="true" />
+          </div>
+          <h3>No encontramos solicitudes disponibles</h3>
+          <p>Cuando aparezcan solicitudes en tus categorias, las vas a encontrar aca.</p>
+        </div>
+      }
+    </section>
+
+    <!-- =====================================================
+         MY PROPOSALS
+         ===================================================== -->
+
+    <section class="dashboard-section">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">MIS PROPUESTAS</span>
+          <h2>Propuestas enviadas</h2>
+        </div>
+
+        <button type="button" class="text-button" (click)="viewAllRequests()">
+          Ver solicitudes
+        </button>
+      </div>
+
+      @if (myProposalRequests().length > 0) {
+        <div class="requests-grid">
+          @for (request of myProposalRequests(); track request.id) {
+            <article
+              class="request-card"
+              tabindex="0"
+              role="button"
+              (click)="openRequest(request.id)"
+              (keydown.enter)="openRequest(request.id)"
+              (keydown.space)="openRequest(request.id)"
+            >
+              <div class="request-card__top">
+                <span class="category">{{ getCategoryLabel(request.category) }}</span>
+
+                @for (proposal of request.proposals; track proposal.id) {
+                  @if (proposal.workerId === profile()?.id) {
+                    <span class="status" [attr.data-proposal-status]="proposal.status">
+                      <!-- FIX: PROPOSAL_STATUS_LABELS -->
+                      {{ PROPOSAL_STATUS_LABELS[proposal.status] }}
+                    </span>
+                  }
+                }
+              </div>
+
+              <h3>{{ request.title }}</h3>
+              <p class="description">{{ request.description }}</p>
+
+              <div class="request-card__meta">
+                <span>{{ request.address }}</span>
+              </div>
+
+              <lucide-icon
+                class="arrow"
+                [img]="icons.ArrowRight"
+                [size]="19"
+                [strokeWidth]="2"
+                aria-hidden="true"
+              />
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="empty-state empty-state--compact">
+          <div class="empty-icon">
+            <lucide-icon
+              [img]="icons.ClipboardList"
+              [size]="24"
+              [strokeWidth]="1.9"
+              aria-hidden="true"
+            />
+          </div>
+          <h3>Todavia no enviaste propuestas</h3>
+          <p>Explora las solicitudes abiertas y envia una propuesta para conseguir nuevos trabajos.</p>
+
+          <button type="button" class="primary-button" (click)="openOpportunities()">
+            <lucide-icon [img]="icons.Search" [size]="18" [strokeWidth]="2.2" aria-hidden="true" />
+            <span>Buscar trabajos</span>
+          </button>
+        </div>
+      }
+    </section>
+
+    <!-- =====================================================
+         PROFILE / REPUTATION
+         ===================================================== -->
+
+    <section class="dashboard-section">
+      <div class="dashboard-columns">
+        <article class="info-card">
+          <div class="info-card__header">
+            <div class="info-card__icon">
+              <lucide-icon [img]="icons.Star" [size]="21" [strokeWidth]="2" aria-hidden="true" />
+            </div>
+            <div>
+              <span class="eyebrow">REPUTACION</span>
+              <h2>Tu reputacion</h2>
+            </div>
+          </div>
+
+          <div class="rating">
+            <strong>{{ profile()?.rating ?? '—' }}</strong>
+            <span>/ 5</span>
+          </div>
+
+          <p>Tu calificacion refleja las experiencias de tus clientes.</p>
+        </article>
+
+        <article class="info-card">
+          <div class="info-card__header">
+            <div class="info-card__icon">
+              <lucide-icon
+                [img]="icons.ShieldCheck"
+                [size]="21"
+                [strokeWidth]="2"
+                aria-hidden="true"
+              />
+            </div>
+            <div>
+              <span class="eyebrow">PERFIL</span>
+              <h2>Estado profesional</h2>
+            </div>
+          </div>
+
+          <span class="worker-status" [attr.data-status]="profile()?.status">
+            {{ workerStatusLabel() }}
+          </span>
+
+          @if (canReceiveRequests()) {
+            <p>Tu perfil esta verificado y puede recibir nuevas oportunidades.</p>
+          } @else {
+            <p>Tu perfil todavia no esta habilitado para recibir nuevas oportunidades.</p>
+          }
+
+          <button type="button" class="text-button" (click)="viewProfile()">
+            Ver mi perfil
+            <lucide-icon
+              [img]="icons.ArrowRight"
+              [size]="16"
+              [strokeWidth]="2"
+              aria-hidden="true"
+            />
+          </button>
+        </article>
+      </div>
+    </section>
+  }
+</section>

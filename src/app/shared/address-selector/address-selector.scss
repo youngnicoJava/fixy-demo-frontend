@@ -1,0 +1,314 @@
+@use '../styles/variables' as *;
+
+/* =========================================================
+   ADDRESS SELECTOR
+   ========================================================= */
+
+.address-selector {
+  position: relative;
+}
+
+/* =========================================================
+   BUTTON (toggle del dropdown)
+   ========================================================= */
+
+.address-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  padding: 0.5rem 1rem;
+
+  border: none;
+  border-radius: 999px;
+
+  background: white;
+
+  cursor: pointer;
+
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f9fafb;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(0, 0, 128, 0.22);
+    outline-offset: 2px;
+  }
+
+  // Flecha: rota cuando el dropdown esta abierto.
+  lucide-icon:last-child {
+    transition: transform 0.2s ease;
+  }
+
+  lucide-icon.rotated {
+    transform: rotate(180deg);
+  }
+}
+
+:host-context(.navbar.scrolled) .address-button {
+  background: transparent;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.address-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+
+  small {
+    max-width: 150px;
+
+    overflow: hidden;
+
+    color: #4b5563;
+
+    font-size: 0.875rem;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  strong {
+    color: #000080;
+
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+}
+
+/* =========================================================
+   DROPDOWN
+   ========================================================= */
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 3.5rem;
+
+  width: 280px;
+
+  padding: 1rem;
+
+  border-radius: 1rem;
+
+  background: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+  z-index: 200;
+
+  animation: dropdown-fade-in 0.15s ease-out;
+
+  .title {
+    margin: 0 0 0.75rem;
+
+    color: #000080;
+
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}
+
+@keyframes dropdown-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   ADDRESS ITEM
+   ========================================================= */
+
+.address-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  width: 100%;
+  padding: 0.75rem;
+
+  border-radius: 0.75rem;
+
+  background: white;
+
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+
+  // Direccion activa: fondo suave + borde a la izquierda.
+  &.active {
+    background: rgba(0, 0, 128, 0.06);
+    border-left: 3px solid #000080;
+  }
+
+  .address-main {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+
+    padding: 0;
+
+    background: none;
+    border: none;
+
+    // Hereda la tipografia del contenedor.
+    font: inherit;
+
+    cursor: pointer;
+
+    strong {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      color: #1f2937;
+
+      font-weight: 600;
+    }
+
+    span {
+      max-width: 180px;
+
+      overflow: hidden;
+
+      color: #6b7280;
+
+      font-size: 0.8rem;
+
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .address-actions {
+    display: flex;
+    gap: 4px;
+
+    flex-shrink: 0;
+
+    .icon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 4px 6px;
+
+      border: none;
+      border-radius: 6px;
+
+      background: none;
+
+      color: #9ca3af;
+
+      cursor: pointer;
+
+      transition: background 0.2s, color 0.2s;
+
+      &:hover {
+        background: #e5e7eb;
+        color: #000080;
+      }
+
+      &:focus-visible {
+        outline: 2px solid #000080;
+        outline-offset: 1px;
+      }
+
+      &.danger:hover {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+
+      &.danger:focus-visible {
+        outline-color: #dc2626;
+      }
+    }
+  }
+}
+
+/* =========================================================
+   ACTIVE BADGE
+   ========================================================= */
+
+.active-badge {
+  display: inline-block;
+
+  padding: 1px 6px;
+
+  border-radius: 999px;
+
+  background: #000080;
+  color: white;
+
+  font-size: 0.6rem;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* =========================================================
+   EMPTY MESSAGE
+   ========================================================= */
+
+.empty-message {
+  padding: 16px;
+
+  color: #6b7280;
+
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* =========================================================
+   ADD BUTTON
+   ========================================================= */
+
+.add-button {
+  width: 100%;
+
+  margin-top: 0.5rem;
+  padding: 0.7rem;
+
+  border: none;
+  border-radius: 0.75rem;
+
+  background: #000080;
+  color: white;
+
+  font: inherit;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: background 0.2s;
+
+  &:hover {
+    background: #0000a0;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(0, 0, 128, 0.22);
+    outline-offset: 2px;
+  }
+}@media(max-width:768px){
+ :host { display:block;min-width:0; }
+ .address-button { width:100%;padding:8px 0;gap:6px; }
+ .address-info { min-width:0; }
+ .address-info strong,.address-info small { max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+ .address-button lucide-icon { flex-shrink:0; }
+}

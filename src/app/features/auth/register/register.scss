@@ -1,0 +1,272 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+}
+
+.auth-brand-panel {
+  width: 50%;
+  background: var(--color-primary);
+  color: white;
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 2rem;
+  font-weight: 800;
+
+  lucide-icon {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.brand-content h2 {
+  font-size: 3rem;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.brand-content p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.copyright {
+  opacity: 0.7;
+}
+
+.auth-form-panel {
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.auth-form-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+.step-header h1 {
+  font-size: 2rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+}
+
+.subtitle {
+  color: var(--color-secondary);
+  margin-bottom: 2rem;
+}
+
+// ----- Form -----
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+// Excluye checkboxes y radios para no romper su layout nativo
+.form-group input:not([type='checkbox']):not([type='radio']) {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:not([type='checkbox']):not([type='radio']):focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(31, 0, 214, 0.12);
+}
+
+// ----- Botones -----
+.btn-primary {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 14px;
+  background: var(--color-primary);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 1rem;
+  border-radius: 14px;
+  background: white;
+  border: 1px solid var(--color-border);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #f9fafb;
+  border-color: var(--color-primary);
+}
+
+.step-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.step-actions .btn-primary {
+  flex: 1;
+}
+
+// ----- Progress -----
+.register-progress {
+  margin-bottom: 2rem;
+}
+
+.progress-steps {
+  display: flex;
+  align-items: center;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: white;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.step-circle.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.progress-track {
+  flex: 1;
+  height: 4px;
+  background: #e5e7eb;
+  margin: 0 1rem;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 50%;
+  height: 100%;
+  background: var(--color-primary);
+  transition: width 0.4s ease;
+}
+
+.progress-fill.step-two {
+  width: 100%;
+}
+
+// ----- Animaciones -----
+.step-animation {
+  animation: fadeBlur 0.75s ease;
+}
+
+@keyframes fadeBlur {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+// ----- Material -----
+mat-form-field {
+  width: 100%;
+}
+
+// Borde redondeado consistente con el resto de inputs
+.fixy-date-field {
+  width: 100%;
+
+  ::ng-deep .mdc-notched-outline__leading,
+  ::ng-deep .mdc-notched-outline__trailing,
+  ::ng-deep .mdc-notched-outline__notch {
+    border-radius: 14px;
+  }
+}
+
+// ----- Errores -----
+.error {
+  display: block;
+  margin-top: 0.35rem;
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+// ----- Links -----
+.auth-link {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: var(--color-secondary);
+}
+
+.auth-link a {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+// ----- Responsive -----
+@media (max-width: 992px) {
+  .auth-brand-panel {
+    display: none;
+  }
+
+  .auth-form-panel {
+    width: 100%;
+  }
+}

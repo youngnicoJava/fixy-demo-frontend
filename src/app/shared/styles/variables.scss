@@ -1,0 +1,105 @@
+// =========================================================
+// COLORS
+// =========================================================
+
+$primary: #0b3b82;
+$primary-dark: #06265a;
+$primary-light: #e8f0ff;
+
+$text-main: #172033;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+
+$background: #f8fafc;
+$white: #ffffff;
+
+$success: #16a34a;
+$success-light: #dcfce7;
+
+$warning: #d97706;
+$warning-light: #fef3c7;
+
+$danger: #dc2626;
+$danger-light: #fee2e2;
+
+$info: #2563eb;
+$info-light: #dbeafe;
+
+$border: #e2e8f0;
+$border-light: #f1f5f9;
+
+// =========================================================
+// STATUS COLORS
+// =========================================================
+
+$status-open: #2563eb;
+$status-open-bg: #dbeafe;
+
+$status-matched: #7c3aed;
+$status-matched-bg: #ede9fe;
+
+$status-in-progress: #d97706;
+$status-in-progress-bg: #fef3c7;
+
+$status-completed: #16a34a;
+$status-completed-bg: #dcfce7;
+
+$status-expired: #64748b;
+$status-expired-bg: #f1f5f9;
+
+$status-cancelled: #dc2626;
+$status-cancelled-bg: #fee2e2;
+
+// =========================================================
+// SPACING
+// =========================================================
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+
+// =========================================================
+// BORDER RADIUS
+// =========================================================
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 20px;
+$radius-xl: 28px;
+
+// =========================================================
+// SHADOWS
+// =========================================================
+
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+$shadow-card: 0 8px 24px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
+
+// =========================================================
+// TYPOGRAPHY
+// =========================================================
+
+$font-size-xs: 12px;
+$font-size-sm: 14px;
+$font-size-md: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 24px;
+$font-size-2xl: 32px;
+
+// =========================================================
+// LAYOUT
+// =========================================================
+
+$container-max-width: 1200px;
+$sidebar-width: 260px;
+
+// =========================================================
+// TRANSITIONS
+// =========================================================
+
+$transition-fast: 150ms ease;
+$transition-normal: 250ms ease;
+$transition-slow: 350ms ease;

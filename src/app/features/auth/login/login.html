@@ -1,0 +1,83 @@
+<p style="padding:12px;text-align:center">Autenticación local de demostración. Usuarios: cliente@fixy.demo o trabajador@fixy.demo · Clave: Demo123! · No uses contraseñas reales.</p><div class="login-page">
+  <div class="brand-panel">
+    <div class="brand-logo">
+      <lucide-icon [img]="WrenchIcon"></lucide-icon>
+      <span>Fixy</span>
+    </div>
+
+    <div class="brand-content">
+      <h2>Encontra el profesional que necesitas</h2>
+      <p>Plomeros, electricistas, pintores y mas — cerca tuyo y listos para ayudarte.</p>
+    </div>
+
+    <div class="brand-footer">© 2026 Fixy. Todos los derechos reservados.</div>
+  </div>
+
+  <div class="login-panel">
+    <div class="login-content">
+      <h1>Iniciar Sesion</h1>
+      <p class="login-subtitle">Ingresa a tu cuenta para continuar</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="email">Email o usuario</label>
+          <input
+            id="email"
+            type="text"
+            formControlName="email"
+            placeholder="Correo electronico o nombre de usuario"
+            autocomplete="username"
+          />
+
+          @if (email.touched && email.invalid) {
+            <small class="error">
+              @if (email.errors?.['required']) { El campo es obligatorio }
+              @if (email.errors?.['email']) { Ingresa un email valido }
+            </small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contrasena</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="Contrasena"
+            autocomplete="current-password"
+          />
+
+          @if (password.touched && password.invalid) {
+            <small class="error">
+              @if (password.errors?.['required']) { La contrasena es obligatoria }
+              @if (password.errors?.['minlength']) { Minimo 8 caracteres }
+            </small>
+          }
+        </div>
+
+        <!-- Mensaje de error del backend -->
+        @if (errorMessage()) {
+          <small class="error error-server">{{ errorMessage() }}</small>
+        }
+
+        <button
+          type="submit"
+          class="login-button"
+          [disabled]="loginForm.invalid || isLoading()"
+        >
+          @if (isLoading()) {
+            <span class="spinner"></span>
+            Ingresando...
+          } @else {
+            Ingresar
+          }
+        </button>
+      </form>
+
+      <div class="login-footer">
+        No tenes cuenta?
+        <a routerLink="/register">Registrate</a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,327 @@
+<div class="onboarding-container">
+  <!-- Header -->
+  <div class="onboarding-header">
+    <h1>Unite a Fixy</h1>
+    <p>Completá los siguientes pasos para convertirte en profesional de oficios</p>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-bar">
+    @for (step of [0,1,2,3]; track step) {
+    <div
+      class="progress-step"
+      [class.active]="step === currentStep()"
+      [class.completed]="step < currentStep()"
+    >
+      <span class="step-number">{{ step + 1 }}</span>
+      <span class="step-label">
+        @if (step === 0) { Profesión } @if (step === 1) { Ubicación } @if (step === 2) { Detalles }
+        @if (step === 3) { Confirmar }
+      </span>
+    </div>
+    }
+  </div>
+
+  <!-- FIX 3: banner de error en reemplazo del alert() -->
+  @if (errorMessage()) {
+  <div class="error-banner" role="alert">
+    {{ errorMessage() }}
+    <button
+      type="button"
+      class="btn-dismiss-error"
+      (click)="errorMessage.set(null)"
+      aria-label="Cerrar"
+    >
+      ✕
+    </button>
+  </div>
+  }
+
+  <!-- Step content -->
+  <div class="step-content">
+    <!-- STEP 0: Categorías -->
+    @if (currentStep() === 0) {
+    <div class="step">
+      <h2>¿Cuál es tu oficio?</h2>
+      <p class="step-hint">Seleccioná hasta 2 categorías que mejor describan tu trabajo</p>
+
+      <div class="category-grid">
+        <!-- FIX 5: usamos cat.image y cat.icon precomputados en vez de métodos -->
+        @for (cat of categories; track cat.value) {
+        <button
+          type="button"
+          class="category-card"
+          [class.selected]="isCategorySelected(cat.value)"
+          (click)="toggleCategory(cat.value)"
+        >
+          <img [src]="cat.image" [alt]="cat.label" class="category-image" />
+          <span class="category-label">{{ cat.label }}</span>
+          @if (isCategorySelected(cat.value)) {
+          <span class="check-badge">✓</span>
+          }
+        </button>
+        }
+      </div>
+
+      <div class="step-actions">
+        <!-- FIX 4: isStepValid es computed, se sigue llamando con paréntesis -->
+        <button class="btn-next" [disabled]="!isStepValid()" (click)="nextStep()">
+          Siguiente
+          <lucide-angular [img]="ChevronRightIcon" size="18"></lucide-angular>
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- STEP 1: Dirección -->
+    @if (currentStep() === 1) {
+    <div class="step">
+      <h2>Seleccioná tu ubicación</h2>
+      <p class="step-hint">
+        Tu dirección no se va a hacer pública, solo la usamos para calcular distancia con los
+        clientes.
+      </p>
+
+      <div class="address-section">
+        @if (addresses().length > 0) {
+        <div class="address-list">
+          @for (addr of addresses(); track addr.id) {
+          <button
+            type="button"
+            class="address-card"
+            [class.selected]="selectedAddress()?.id === addr.id"
+            (click)="selectAddress(addr)"
+          >
+            <div class="address-info">
+              <strong>{{ addr.label }}</strong>
+              <span>{{ addr.address }}</span>
+              @if (addr.floor || addr.apartment) {
+              <small
+                >{{ addr.floor }}{{ addr.floor && addr.apartment ? ' - ' : '' }}{{ addr.apartment
+                }}</small
+              >
+              }
+            </div>
+            @if (selectedAddress()?.id === addr.id) {
+            <span class="check-badge">✓</span>
+            }
+          </button>
+          }
+        </div>
+        } @else {
+        <div class="no-address">
+          <p>No tenés direcciones agregadas en tu cuenta.</p>
+          <button type="button" class="btn-add-address" (click)="openAddressModal()">
+            + Agregar dirección
+          </button>
+        </div>
+        }
+      </div>
+
+      <div class="step-actions">
+        <button type="button" class="btn-prev" (click)="prevStep()">
+          <lucide-angular [img]="ChevronLeftIcon" size="18"></lucide-angular>
+          Anterior
+        </button>
+        <button class="btn-next" [disabled]="!isStepValid()" (click)="nextStep()">
+          Siguiente
+          <lucide-angular [img]="ChevronRightIcon" size="18"></lucide-angular>
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- STEP 2: Detalles -->
+    @if (currentStep() === 2) {
+    <div class="step">
+      <h2>Contanos sobre vos</h2>
+      <p class="step-hint">
+        Completá la siguiente información para que los clientes te conozcan mejor.
+      </p>
+
+      <div class="form-group">
+        <label for="description">Breve descripción de tu experiencia</label>
+        <!-- FIX 4: [ngModel] + (ngModelChange) en vez de [(ngModel)] -->
+        <textarea
+          id="description"
+          [ngModel]="description()"
+          (ngModelChange)="description.set($event)"
+          placeholder="Ej: Plomero con 10 años de experiencia en instalaciones y reparaciones..."
+          rows="4"
+        ></textarea>
+        <!-- FIX 4: description ahora es señal, se lee con () -->
+        <small>{{ description().length }}/500 caracteres</small>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="years">Años de experiencia (opcional)</label>
+          <!-- FIX 4: signal + ngModel split -->
+          <input
+            id="years"
+            type="number"
+            [ngModel]="yearsOfExperience()"
+            (ngModelChange)="yearsOfExperience.set($event)"
+            placeholder="Ej: 5"
+            min="0"
+            max="50"
+          />
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <!-- FIX 4: signal + ngModel split -->
+            <input
+              type="checkbox"
+              [ngModel]="hasCertificate()"
+              (ngModelChange)="hasCertificate.set($event)"
+            />
+            Tengo certificaciones o títulos
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group file-group">
+        <label>Subí tu DNI o documento de identidad</label>
+        <div class="file-drop">
+          <!-- FIX 4: dniFile ahora es señal -->
+          @if (!dniFile()) {
+          <label for="dni-upload" class="file-label">
+            <lucide-angular [img]="UploadIcon" size="24"></lucide-angular>
+            <span>Hacé click para subir tu DNI (opcional)</span>
+            <input
+              id="dni-upload"
+              type="file"
+              accept="image/*,.pdf"
+              (change)="onFileSelected($event)"
+              hidden
+            />
+          </label>
+          } @else {
+          <div class="file-info">
+            <lucide-angular [img]="FileTextIcon" size="20"></lucide-angular>
+            <!-- FIX 4: dniFileName ahora es señal -->
+            <span>{{ dniFileName() }}</span>
+            <button type="button" class="btn-remove-file" (click)="removeFile()">✕</button>
+          </div>
+          }
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button type="button" class="btn-prev" (click)="prevStep()">
+          <lucide-angular [img]="ChevronLeftIcon" size="18"></lucide-angular>
+          Anterior
+        </button>
+        <button class="btn-next" [disabled]="!isStepValid()" (click)="nextStep()">
+          Siguiente
+          <lucide-angular [img]="ChevronRightIcon" size="18"></lucide-angular>
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- STEP 3: Confirmación -->
+    @if (currentStep() === 3) {
+    <div class="step">
+      @if (!isSubmitted()) {
+      <h2>Revisá tu solicitud</h2>
+      <p class="step-hint">Confirmá que todos los datos sean correctos antes de enviar.</p>
+
+      <div class="summary">
+        <div class="summary-item">
+          <strong>Categorías:</strong>
+          <span>{{ selectedCategories().join(', ') }}</span>
+        </div>
+        <div class="summary-item">
+          <strong>Dirección:</strong>
+          <span>{{ selectedAddress()?.address }}</span>
+        </div>
+        <div class="summary-item">
+          <strong>Descripción:</strong>
+          <!-- FIX 4: description ahora es señal -->
+          <span>{{ description() }}</span>
+        </div>
+        <!-- FIX 4: yearsOfExperience ahora es señal -->
+        @if (yearsOfExperience()) {
+        <div class="summary-item">
+          <strong>Años de experiencia:</strong>
+          <span>{{ yearsOfExperience() }}</span>
+        </div>
+        }
+        <div class="summary-item">
+          <strong>Certificaciones:</strong>
+          <!-- FIX 4: hasCertificate ahora es señal -->
+          <span>{{ hasCertificate() ? 'Sí' : 'No' }}</span>
+        </div>
+        <!-- FIX 4: dniFileName ahora es señal -->
+        @if (dniFileName()) {
+        <div class="summary-item">
+          <strong>DNI adjunto:</strong>
+          <span>{{ dniFileName() }}</span>
+        </div>
+        }
+      </div>
+
+      <div class="terms">
+        <label class="terms-label">
+          <!-- FIX 4: acceptedTerms ahora es señal -->
+          <input
+            type="checkbox"
+            [ngModel]="acceptedTerms()"
+            (ngModelChange)="acceptedTerms.set($event)"
+          />
+          Acepto los <a routerLink="/terms" target="_blank">Términos y condiciones</a> y la
+          <a routerLink="/privacy" target="_blank">Política de privacidad</a> de Fixy.
+        </label>
+      </div>
+
+      <div class="step-actions">
+        <button type="button" class="btn-prev" (click)="prevStep()">
+          <lucide-angular [img]="ChevronLeftIcon" size="18"></lucide-angular>
+          Anterior
+        </button>
+        <!-- FIX 4: canSubmit es computed, se sigue llamando con paréntesis -->
+        <button
+          type="button"
+          class="btn-submit"
+          [disabled]="!canSubmit() || isLoading()"
+          (click)="submit()"
+        >
+          @if (isLoading()) {
+          <span>Enviando...</span>
+          } @else {
+          <span>Enviar solicitud</span>
+          }
+        </button>
+      </div>
+      }
+
+      <!-- Success screen -->
+@if (isSubmitted()) {
+<div class="success-screen">
+  <div class="success-icon-wrapper">
+    <lucide-angular
+      [img]="CircleCheckBigIcon"
+      size="48"
+      strokeWidth="1.5"
+    ></lucide-angular>
+  </div>
+
+  <h2>¡Solicitud enviada!</h2>
+  <p class="success-message">
+    Tu solicitud fue recibida y será revisada por un administrador.
+  </p>
+  <p class="success-detail">
+    Te vamos a enviar un mail con el resultado de la revisión.
+  </p>
+
+  <button type="button" class="btn-home" (click)="goHome()">
+    Volver al inicio
+  </button>
+</div>
+}
+    </div>
+    }
+  </div>
+</div>

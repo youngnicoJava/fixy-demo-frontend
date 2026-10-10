@@ -1,0 +1,8 @@
+@if (toastService.currentMessage(); as message) {
+<div class="toast" role="status">
+  <span class="toast-icon">
+    <lucide-icon [img]="icons.Check" [size]="16" strokeWidth="2.5" />
+  </span>
+  <span class="toast-message"> {{ message }} </span>
+</div>
+}

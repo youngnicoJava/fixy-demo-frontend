@@ -1,0 +1,112 @@
+<section class="conversation-list">
+  <header class="list-header">
+    <div>
+      <span class="eyebrow">Mensajes</span>
+      <h1>Conversaciones</h1>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      (click)="loadConversations()"
+      [disabled]="loading()"
+      aria-label="Actualizar conversaciones"
+    >
+      <lucide-icon [img]="icons.RefreshCw" [size]="18" />
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="state-card loading-state">
+      <div class="spinner"></div>
+      <span>Cargando conversaciones...</span>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="state-card error-state">
+      <lucide-icon [img]="icons.MessageCircle" [size]="24" />
+
+      <div>
+        <strong>No pudimos cargar tus conversaciones</strong>
+        <p>{{ error() }}</p>
+      </div>
+
+      <button type="button" class="retry-button" (click)="loadConversations()">
+        Reintentar
+      </button>
+    </div>
+  }
+
+  @if (isEmpty()) {
+    <div class="state-card empty-state">
+      <div class="empty-icon">
+        <lucide-icon [img]="icons.MessageCircle" [size]="28" />
+      </div>
+
+      <h2>Todavía no tenés conversaciones</h2>
+
+      <p>
+        Cuando aceptes una propuesta y se habilite una conversación,
+        va a aparecer acá.
+      </p>
+    </div>
+  }
+
+  @if (hasConversations()) {
+    <div class="conversation-items">
+      @for (conversation of conversations(); track conversation.conversationId) {
+        <button
+          type="button"
+          class="conversation-item"
+          [class.active]="activeId === conversation.conversationId"
+          [class.unread]="isUnread(conversation)"
+          (click)="onSelect(conversation)"
+        >
+          <div
+            class="conversation-avatar"
+            [ngClass]="getAvatarClass(getCounterpartName(conversation))"
+          >
+            @if (getCounterpartPhotoUrl(conversation); as photoUrl) {
+              <img [src]="photoUrl" alt="" loading="lazy" />
+            } @else if (getCounterpartName(conversation)) {
+              {{ getCounterpartInitial(conversation) }}
+            } @else {
+              <lucide-icon [img]="icons.MessageCircle" [size]="20" />
+            }
+          </div>
+
+          <div class="conversation-content">
+            <div class="conversation-top">
+              <strong>{{ getCounterpartName(conversation) }}</strong>
+
+              <span class="conversation-date">
+                {{ formatDate(conversation.updatedAt) }}
+              </span>
+            </div>
+
+            <div class="conversation-meta">
+              <span
+                class="conversation-context"
+                [ngClass]="getConversationContextClass(conversation)"
+              >
+                {{ getConversationContext(conversation) }}
+              </span>
+
+              <span
+                class="conversation-status"
+                [class]="getStatusClass(conversation.status)"
+              >
+                {{ getStatusLabel(conversation.status) }}
+              </span>
+            </div>
+
+            <p class="conversation-preview">
+              {{ getPreview(conversation) }}
+            </p>
+          </div>
+        </button>
+      }
+    </div>
+  }
+</section>

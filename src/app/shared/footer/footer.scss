@@ -1,0 +1,273 @@
+@mixin dot-grid($rows, $cols) {
+  $dots: ();
+  $base-size: 2.8px;
+  $size-increment: 0.1px;
+
+  @for $row from 1 through $rows {
+    $row-percent: ($row / ($rows + 1)) * 100%;
+    $dot-size: $base-size + ($row - 1) * $size-increment;
+
+    @for $col from 1 through $cols {
+      $col-percent: ($col / ($cols + 1)) * 100%;
+      $dot: radial-gradient(
+        circle at #{$col-percent} #{$row-percent},
+        rgba(255, 255, 255, 0.06) #{$dot-size},
+        transparent #{$dot-size}
+      );
+      $dots: append($dots, $dot, comma);
+    }
+  }
+
+  background-image: $dots;
+}
+
+.footer {
+  background: #0a0a1a;
+  color: #e5e7eb;
+  padding: 4rem 2rem 0;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    @include dot-grid(21, 19);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+
+  // Contenedor principal
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 2.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid #1a1a2e;
+    position: relative;
+    z-index: 1;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .footer-column {
+    h4 {
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 1rem 0;
+      letter-spacing: 0.3px;
+    }
+
+    .legal-title {
+      margin-top: 1.5rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        margin-bottom: 0.6rem;
+
+        a {
+          color: #9ca3af;
+          text-decoration: none;
+          font-size: 0.85rem;
+          transition: 0.2s;
+
+          &:hover {
+            color: #ffffff;
+          }
+        }
+      }
+    }
+  }
+
+  // Inversores
+  .investors-bar {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #1a1a2e;
+    position: relative;
+    z-index: 1;
+
+    .investors-content {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+
+      h4 {
+        color: #ffffff;
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0;
+        white-space: nowrap;
+      }
+
+      ul {
+        display: flex;
+        gap: 1.5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-wrap: wrap;
+
+        li {
+          a {
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: 0.2s;
+
+            &:hover {
+              color: #ffffff;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Contacto y redes
+  .contact-bar {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #1a1a2e;
+    position: relative;
+    z-index: 1;
+
+    .contact-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      .contact-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+
+        .contact-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #9ca3af;
+          font-size: 0.85rem;
+
+          a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: 0.2s;
+
+            &:hover {
+              color: #ffffff;
+            }
+          }
+        }
+      }
+
+      .social-links {
+        display: flex;
+        gap: 0.75rem;
+
+        a {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          background: #1a1a2e;
+          border-radius: 50%;
+          color: #e5e7eb;
+          text-decoration: none;
+          transition: 0.2s;
+
+          &:hover {
+            background: #000080;
+            transform: translateY(-2px);
+          }
+        }
+      }
+    }
+  }
+
+  // Footer bottom
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 0 2rem;
+    position: relative;
+    z-index: 1;
+
+    .bottom-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      p {
+        color: #6b7280;
+        font-size: 0.85rem;
+        margin: 0;
+      }
+
+      .bottom-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+
+        a {
+          color: #6b7280;
+          text-decoration: none;
+          font-size: 0.85rem;
+          transition: 0.2s;
+
+          &:hover {
+            color: #ffffff;
+          }
+        }
+      }
+    }
+
+    .company-data {
+      padding-top: 1rem;
+      border-top: 1px solid #1a1a2e;
+
+      .company-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        align-items: center;
+
+        span {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          color: #6b7280;
+          font-size: 0.75rem;
+        }
+      }
+    }
+  }
+}

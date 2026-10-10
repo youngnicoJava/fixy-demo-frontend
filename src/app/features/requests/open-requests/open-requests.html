@@ -1,0 +1,216 @@
+<section class="open-requests-page">
+  <header class="page-header">
+    <button type="button" class="back-button" (click)="goBack()" aria-label="Volver al dashboard">
+      <lucide-icon [img]="icons.ArrowLeft" [size]="18" />
+      <span>Dashboard</span>
+    </button>
+
+    <div class="header-content">
+      <div>
+        <span class="eyebrow">Oportunidades</span>
+
+        <h1>Solicitudes disponibles</h1>
+
+        <p>Encontrá trabajos de tus categorías y enviá tu propuesta.</p>
+      </div>
+
+      @if (isVerified()) {
+      <div class="verified-badge">
+        <lucide-icon [img]="icons.CheckCircle" [size]="16" />
+        <span>Perfil verificado</span>
+      </div>
+      }
+    </div>
+  </header>
+
+  @if (loading()) {
+
+  <div class="loading-state">
+    <div class="loading-spinner"></div>
+
+    <p>Buscando solicitudes...</p>
+  </div>
+
+  } @else if (error()) {
+
+  <div class="state-card error-state">
+    <div class="state-icon">
+      <lucide-icon [img]="icons.Search" [size]="22" />
+    </div>
+
+    <h2>No pudimos cargar las solicitudes</h2>
+
+    <p>Ocurrió un problema al buscar oportunidades disponibles.</p>
+
+    <button type="button" class="primary-button" (click)="retry()">Intentar nuevamente</button>
+  </div>
+
+  } @else if (!isVerified()) {
+
+  <div class="state-card">
+    <div class="state-icon">
+      <lucide-icon [img]="icons.CheckCircle" [size]="22" />
+    </div>
+
+    <h2>Tu perfil todavía no está habilitado</h2>
+
+    <p>Necesitás tener un perfil de trabajador verificado para acceder a las solicitudes.</p>
+  </div>
+
+  } @else if (categories().length === 0) {
+
+  <div class="state-card">
+    <div class="state-icon">
+      <lucide-icon [img]="icons.Search" [size]="22" />
+    </div>
+
+    <h2>No tenés categorías configuradas</h2>
+
+    <p>Agregá al menos un oficio a tu perfil para comenzar a recibir oportunidades.</p>
+  </div>
+
+  } @else {
+
+  <section class="content">
+    <div class="category-filter">
+      <button
+        type="button"
+        class="category-chip"
+        [class.active]="selectedCategory() === null"
+        (click)="selectCategory(null)"
+      >
+        Todas
+      </button>
+
+      @for (category of categories(); track category) {
+      <button
+        type="button"
+        class="category-chip"
+        [class.active]="selectedCategory() === category"
+        (click)="selectCategory(category)"
+      >
+        {{ getCategoryLabel(category) }}
+      </button>
+      }
+    </div>
+
+    @if (hasRequests()) {
+
+    <div class="results-header">
+      <div>
+        <span class="results-count">
+          {{ filteredRequests().length }} {{ filteredRequests().length === 1 ? 'solicitud' :
+          'solicitudes' }}
+        </span>
+
+        <span class="results-description"> disponibles para tus categorías </span>
+      </div>
+    </div>
+
+    <div class="requests-list">
+      @for (request of filteredRequests(); track request.id) { @let ownProposal =
+      hasOwnProposal(request); @let unavailable = isUnavailable(request);
+
+      <article
+        class="request-card"
+        [class.has-proposal]="ownProposal"
+        [class.unavailable]="unavailable"
+      >
+        <div class="card-main">
+          <div class="card-top">
+            <span class="category-label"> {{ getCategoryLabel(request.category) }} </span>
+
+            @if (ownProposal) {
+
+            <span class="proposal-status">
+              <lucide-icon [img]="icons.CheckCircle" [size]="14" />
+              Ya enviaste una propuesta
+            </span>
+
+            } @else if (unavailable) {
+
+            <span class="unavailable-status"> No disponible </span>
+
+            }
+          </div>
+
+          <h2>{{ request.title }}</h2>
+
+          <p class="description">{{ request.description }}</p>
+
+          <div class="request-meta">
+            <span>
+              <lucide-icon [img]="icons.MapPin" [size]="15" />
+              {{ request.address }}
+            </span>
+
+            <span>
+              <lucide-icon [img]="icons.Clock" [size]="15" />
+              {{ getTimeLabel(request.createdAt) }}
+            </span>
+
+            <span
+              class="expiration"
+              [class.expiring]="
+                      !isExpired(request) &&
+                      request.expiresAt
+                    "
+            >
+              <lucide-icon [img]="icons.Clock" [size]="15" />
+              {{ getExpirationLabel(request.expiresAt) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="card-action">
+          @if (ownProposal) {
+
+          <button type="button" class="secondary-button" (click)="openRequest(request)">
+            Ver solicitud
+            <lucide-icon [img]="icons.ChevronRight" [size]="17" />
+          </button>
+
+          } @else if (!unavailable) {
+
+          <button type="button" class="primary-button" (click)="openRequest(request)">
+            Ver solicitud
+            <lucide-icon [img]="icons.ChevronRight" [size]="17" />
+          </button>
+
+          } @else {
+
+          <button type="button" class="secondary-button" disabled>No disponible</button>
+
+          }
+        </div>
+      </article>
+
+      }
+    </div>
+
+    } @else {
+
+    <div class="empty-state">
+      <div class="empty-icon">
+        <lucide-icon [img]="icons.Search" [size]="25" />
+      </div>
+
+      <h2>No hay solicitudes por ahora</h2>
+
+      <p>
+        No encontramos trabajos disponibles para {{ selectedCategory() ?
+        getCategoryLabel(selectedCategory()!) : 'tus categorías' }}.
+      </p>
+
+      @if (selectedCategory() !== null) {
+      <button type="button" class="secondary-button" (click)="selectCategory(null)">
+        Ver todas
+      </button>
+      }
+    </div>
+
+    }
+  </section>
+
+  }
+</section>

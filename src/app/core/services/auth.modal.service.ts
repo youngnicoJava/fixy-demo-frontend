@@ -1,0 +1,17 @@
+import { Injectable } from '@angular/core';
+import { signal } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthModalService {
+  readonly open = signal(false);
+
+  show(): void {
+    this.open.set(true);
+  }
+
+  hide(): void {
+    this.open.set(false);
+  }
+}

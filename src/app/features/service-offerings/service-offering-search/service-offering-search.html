@@ -1,0 +1,157 @@
+<section class="service-offering-search">
+  <header class="page-header">
+    <span class="eyebrow">SERVICIOS</span>
+    <h1>{{ resultsTitle() }}</h1>
+
+    @if (categoryLabel()) {
+      <p>Explora servicios ofrecidos por profesionales verificados de Fixy.</p>
+    } @else {
+      <p>Encontra servicios ofrecidos por profesionales verificados de Fixy.</p>
+    }
+  </header>
+
+  @if (loading()) {
+    <div class="service-grid">
+      @for (item of [1, 2, 3, 4]; track item) {
+        <article class="service-card skeleton">
+          <div class="skeleton-image"></div>
+          <div class="service-info">
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+          </div>
+        </article>
+      }
+    </div>
+  } @else if (error()) {
+    <div class="state-card">
+      <div class="state-icon">
+        <lucide-icon [img]="icons.Wrench" [size]="28" [strokeWidth]="1.8" />
+      </div>
+      <h2>No pudimos cargar los servicios</h2>
+      <p>Intenta nuevamente en unos segundos.</p>
+    </div>
+  } @else if (displayedServiceOfferings().length === 0) {
+    <div class="state-card">
+      <div class="state-icon">
+        <lucide-icon [img]="icons.Wrench" [size]="28" [strokeWidth]="1.8" />
+      </div>
+      <h2>No encontramos servicios</h2>
+
+      @if (searchTerm()) {
+        <p>No encontramos servicios que coincidan con tu busqueda en esta categoria.</p>
+      } @else {
+        <p>Todavia no hay servicios publicados en esta categoria.</p>
+      }
+    </div>
+  } @else {
+    @if (hasSearchFallback()) {
+      <div class="search-fallback">
+        <p>
+          No encontramos coincidencias exactas para
+          <strong>"{{ searchTerm() }}"</strong>. Te mostramos otros servicios de
+          {{ categoryLabel() }}.
+        </p>
+      </div>
+    }
+
+    <div class="results-header">
+      <span>
+        {{ displayedServiceOfferings().length }}
+        {{ displayedServiceOfferings().length === 1 ? 'servicio' : 'servicios' }}
+      </span>
+    </div>
+
+    <div class="service-grid">
+      @for (service of displayedServiceOfferings(); track service.id) {
+        <article class="service-card" (click)="goToServiceOffering(service.id)">
+          <div class="service-image">
+            @if (service.imageUrls.length > 0) {
+              <img [src]="service.imageUrls[0]" [alt]="service.title" />
+            } @else {
+              <span class="service-category-icon">
+                <lucide-icon [img]="icons.Wrench" [size]="34" [strokeWidth]="1.8" />
+              </span>
+            }
+
+            @if (service.workerVerified) {
+              <span class="verified-badge">
+                <lucide-icon [img]="icons.BadgeCheck" [size]="14" />
+                Verificado
+              </span>
+            }
+
+            <!-- FIX: usamos favoriteIds() en vez de isFavorite().
+                 Ahora el template depende del signal, asi que se re-renderiza
+                 cuando cambia el estado de favoritos. -->
+            <button
+              type="button"
+              class="favorite-button"
+              [class.active]="favoriteIds().has(service.id)"
+              (click)="toggleFavorite(service.id, $event)"
+              [attr.aria-label]="
+                favoriteIds().has(service.id)
+                  ? 'Quitar de favoritos'
+                  : 'Agregar a favoritos'
+              "
+            >
+              <lucide-icon [img]="icons.Heart" [size]="19" />
+            </button>
+          </div>
+
+          <div class="service-info">
+            <!-- FIX: usamos service.categoryLabel precomputado en vez de
+                 llamar getCategoryLabel(service.category) por cada item. -->
+            <span class="service-category">{{ service.categoryLabel }}</span>
+
+            <h3 class="service-title">{{ service.title }}</h3>
+            <p class="service-description">{{ service.description }}</p>
+
+            <div class="service-price">
+              @if (service.basePrice != null) {
+                <strong>Desde ${{ service.basePrice | number: '1.0-0' }}</strong>
+              } @else {
+                <strong>Precio a consultar</strong>
+              }
+            </div>
+
+            <div class="service-provider">
+              <div class="provider-avatar">
+                @if (service.workerProfilePhotoUrl) {
+                  <img
+                    [src]="service.workerProfilePhotoUrl"
+                    [alt]="service.workerFullName"
+                  />
+                } @else {
+                  <lucide-icon [img]="icons.UserRound" [size]="18" />
+                }
+              </div>
+
+              <div class="provider-info">
+                <p class="provider-name">{{ service.workerFullName }}</p>
+
+                <div class="provider-meta">
+                  @if (service.workerRating != null && service.workerRating > 0) {
+                    <span class="provider-rating">
+                      <lucide-icon [img]="icons.Star" [size]="13" />
+                      {{ service.workerRating.toFixed(1) }}
+                    </span>
+                  } @else {
+                    <span class="provider-rating">Nuevo</span>
+                  }
+
+                  @if (service.workerVerified) {
+                    <span class="provider-verified">
+                      <lucide-icon [img]="icons.BadgeCheck" [size]="13" />
+                      Verificado
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

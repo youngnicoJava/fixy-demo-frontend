@@ -1,0 +1,156 @@
+<nav class="navbar" [class.scrolled]="scrolled()">
+  <div class="navbar-inner">
+    <!-- LOGO -->
+    <header class="info-header">
+      <a routerLink="/home" class="logo-link" (click)="goToHome($event)">
+        <lucide-angular [img]="WrenchIcon" size="28"></lucide-angular>
+        <span class="logo-text">Fixy <small class="demo-logo-label">(demo)</small></span>
+      </a>
+    </header>
+
+    <!-- SEARCH -->
+    <div class="search-bar">
+      <!-- CATEGORY -->
+      <div class="search-field" (click)="toggleCategoryPanel(); $event.stopPropagation()">
+        <span class="search-label">Que necesitas?</span>
+
+        <span class="search-value">
+          {{ selectedCategory() ? selectedCategory()!.label : 'Selecciona un oficio' }}
+        </span>
+
+        @if (categoryOpen()) {
+          <div class="category-panel" (click)="$event.stopPropagation()">
+            <p class="panel-title">Oficios disponibles</p>
+
+            <div class="category-list">
+              @for (cat of categories; track cat.value) {
+                <button
+                  class="category-item"
+                  [class.selected]="selectedCategory()?.value === cat.value"
+                  (click)="selectCategory(cat); $event.stopPropagation()"
+                >
+                  <div class="category-icon">
+                    <ng-icon [svg]="cat.icon" size="26" />
+                  </div>
+
+                  <div class="category-text">
+                    <p class="category-label">{{ cat.label }}</p>
+                    <p class="category-description">{{ cat.description }}</p>
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="search-field search-input">
+        <span class="search-label">Buscar servicio</span>
+
+        <input
+          #serviceSearchInput
+          type="text"
+          placeholder="Ej: destapar caneria"
+          [disabled]="!selectedCategory()"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearchTermChange($event)"
+          (focus)="suggestionsOpen.set(true)"
+        />
+
+        @if (suggestionsOpen() && selectedCategory() && suggestedServices().length > 0) {
+          <div class="service-suggestions" (click)="$event.stopPropagation()">
+            <span class="suggestions-label">Trabajos frecuentes</span>
+
+            <div class="suggestions-list">
+              @for (service of suggestedServices(); track service) {
+                <button
+                
+                  type="button"
+                  class="suggestion-item"
+                  (click)="selectSuggestedService(service)"
+                >
+                  <lucide-angular [img]="SearchIcon"></lucide-angular>
+
+                  {{ service }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- SEARCH BUTTON -->
+      <button
+        class="search-button"
+        [disabled]="!selectedCategory()"
+        (click)="handleSearch()"
+      >
+        <lucide-icon [img]="SearchIcon" size="18" />
+      </button>
+    </div>
+
+    <!-- ADDRESS -->
+    <app-address-selector
+      (opened)="userMenuOpen.set(false); categoryOpen.set(false)"
+    />
+
+    <!-- NOT LOGGED -->
+    @if (!isAuthenticated()) {
+      <div class="auth-section">
+        <button class="btn-text" (click)="goTo('/login')">Iniciar sesion</button>
+        <button class="btn-primary" (click)="goTo('/register')">Registrarse</button>
+      </div>
+    }
+
+    <!-- LOGGED -->
+    @else {
+      <div class="user-section">
+        <a routerLink="/favorites" routerLinkActive="active" class="favorites-link">
+          <lucide-icon [img]="HeartIcon" [size]="19" />
+
+          @if (favoritesCount() > 0) {
+            <span class="favorites-count">{{ favoritesCount() }}</span>
+          }
+        </a>
+
+        <button
+          class="user-avatar-btn"
+          (click)="toggleUserMenu(); $event.stopPropagation()"
+        >
+          <div class="user-avatar">
+            <lucide-icon [img]="UserIcon" size="22" />
+          </div>
+        </button>
+
+        @if (userMenuOpen()) {
+          @if (currentUser$ | async; as user) {
+            <div class="user-menu" (click)="$event.stopPropagation()">
+              <p class="user-name">{{ user.fullName }}</p>
+
+              <hr />
+
+              <button (click)="goTo('/dashboard/client')">Panel</button>
+              <button (click)="goTo('/requests/my')">Mis solicitudes</button>
+              @if(user.role === Role.CLIENT){<button (click)="goTo('/payments')">Pagos</button>}
+              <button (click)="goTo('/dashboard/worker')">Panel profesional</button>
+
+              @if (user.role === Role.ADMIN) {
+                <button
+                  class="admin-menu-item"
+                  (click)="goTo('/admin/workers/pending')"
+                >
+                  <lucide-icon [img]="ShieldCheckIcon" size="18" />
+                  <span>Administracion</span>
+                </button>
+              }
+
+              <hr />
+
+              <button class="logout" (click)="logout()">Cerrar sesion</button>
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+</nav>

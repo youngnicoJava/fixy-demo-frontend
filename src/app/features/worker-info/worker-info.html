@@ -1,0 +1,115 @@
+<div class="worker-info">
+  <!-- Header -->
+  <header class="info-header">
+    <a routerLink="/" class="logo-link">
+      <lucide-angular [img]="WrenchIcon" size="28"></lucide-angular>
+      <span class="logo-text">Fixy</span>
+    </a>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" appScrollReveal>
+    <div class="hero-content">
+      <h1>Convertite en profesional de Fixy</h1>
+      <p>
+        Unite a la plataforma que conecta personas con profesionales de confianza en su zona. Empezá
+        a conseguir clientes hoy.
+      </p>
+
+      <span class="info-trigger" (click)="modalService.open()">
+        <lucide-angular [img]="InfoIcon" size="18"></lucide-angular>
+        Más información para trabajadores
+      </span>
+    </div>
+    <div class="hero-image">
+      <img src="assets/images/undraw-in-progress.svg" alt="Trabajadores" class="hero-svg" />
+    </div>
+  </section>
+
+  <!-- Beneficios -->
+  <section class="benefits">
+    <h2>¿Por qué trabajar con Fixy?</h2>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <lucide-angular [img]="UsersIcon" size="40"></lucide-angular>
+        <h3>Más clientes</h3>
+        <p>Conectate con personas que buscan tus servicios en tu zona.</p>
+      </div>
+      <div class="benefit-card">
+        <lucide-angular [img]="CreditCardIcon" size="40"></lucide-angular>
+        <h3>Pagos seguros</h3>
+        <p>Recibí tus pagos de forma rápida y segura.</p>
+      </div>
+      <div class="benefit-card">
+        <lucide-angular [img]="StarIcon" size="40"></lucide-angular>
+        <h3>Posicionate entre los mejores</h3>
+        <p>Calificaciones y reviews que te ayudan a escalar en el ranking de trabajadores.</p>
+      </div>
+      <div class="benefit-card">
+        <lucide-angular [img]="ShieldIcon" size="40"></lucide-angular>
+        <h3>Seguro y cobertura</h3>
+        <p>Trabajá con tranquilidad, tenés cobertura.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats" appScrollReveal>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <span class="stat-number">500+</span>
+        <span class="stat-label">trabajadores activos</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">1000+</span>
+        <span class="stat-label">servicios completados</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">4.8★</span>
+        <span class="stat-label">calificación promedio</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Requisitos -->
+  <section class="requirements" appScrollReveal>
+    <div class="requirements-content">
+      <h2>Requisitos</h2>
+      <ul>
+        <li>Ser mayor de 18 años</li>
+        <li>Tener experiencia comprobable en tu oficio</li>
+        <li>Contar con DNI o documento de identidad</li>
+        <li>Aceptar los términos y condiciones de la plataforma</li>
+      </ul>
+    </div>
+    <div class="picture-requirements-svg">
+      <img
+        src="assets/images/proccess-requirements.svg"
+        alt="Requisitos"
+        class="requirements-svg"
+      />
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- CTA final -->
+  <section class="cta" appScrollReveal>
+    <h2>¿Listo para empezar?</h2>
+
+    <p>Completá el formulario de registro y empezá a conseguir clientes hoy.</p>
+    <button class="btn-primary" routerLink="/become-worker">
+      Comenzar el registro
+      <lucide-angular [img]="ArrowRightIcon" size="18"></lucide-angular>
+    </button>
+    <span class="info-trigger" (click)="modalService.open()">
+      <lucide-angular [img]="InfoIcon" size="18"></lucide-angular>
+      Más información para trabajadores
+    </span>
+  </section>
+
+  <!-- Modal -->
+  <app-worker-info-modal></app-worker-info-modal>
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>

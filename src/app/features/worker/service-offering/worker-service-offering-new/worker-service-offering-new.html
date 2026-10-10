@@ -1,0 +1,274 @@
+<section class="service-offering-page">
+  @if (loading()) {
+
+  <div class="page-state page-state--loading">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Cargando tu perfil...</p>
+  </div>
+
+  } @else if (errorMessage() && !profile()) {
+
+  <div class="page-state page-state--error">
+    <div class="state-icon" aria-hidden="true">!</div>
+
+    <h2>No pudimos cargar el formulario</h2>
+
+    <p>{{ errorMessage() }}</p>
+
+    <button type="button" class="primary-button" (click)="goBack()">Volver al dashboard</button>
+  </div>
+
+  } @else {
+
+  <header class="page-header">
+    <button type="button" class="back-button" (click)="goBack()">
+      <lucide-icon [img]="icons.ArrowLeft" [size]="18" [strokeWidth]="2" aria-hidden="true" />
+
+      <span>Volver</span>
+    </button>
+
+    <div class="page-header__content">
+      <span class="eyebrow">MIS SERVICIOS</span>
+
+      <h1>Publicá un nuevo servicio</h1>
+
+      <p>Mostrá lo que sabés hacer y ayudá a tus clientes a encontrarte.</p>
+    </div>
+  </header>
+
+  <div class="service-offering-layout">
+    <!-- FORMULARIO -->
+
+    <section class="form-card">
+      <div class="form-card__header">
+        <div class="form-card__icon">
+          <lucide-icon [img]="icons.Wrench" [size]="21" [strokeWidth]="2" aria-hidden="true" />
+        </div>
+
+        <div>
+          <span class="eyebrow">PUBLICACIÓN</span>
+          <h2>Información del servicio</h2>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="title"> Título </label>
+
+        <input
+          id="title"
+          type="text"
+          maxlength="100"
+          [value]="title()"
+          (input)="updateTitle($any($event.target).value)"
+          placeholder="Ej. Instalación y reparación de griferías"
+        />
+
+        <div class="field-footer">
+          <span>Un título claro ayuda a que te encuentren.</span>
+          <span>{{ titleLength() }}/100</span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="description"> Descripción </label>
+
+        <textarea
+          id="description"
+          rows="6"
+          maxlength="500"
+          [value]="description()"
+          (input)="updateDescription($any($event.target).value)"
+          placeholder="Contale a tus clientes qué ofrecés, qué incluye el servicio y cualquier información importante."
+        ></textarea>
+
+        <div class="field-footer">
+          <span>Describí concretamente qué incluye.</span>
+          <span>{{ descriptionLength() }}/500</span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="category"> Categoría </label>
+
+        <select
+          id="category"
+          [value]="category() ?? ''"
+          (change)="updateCategory($any($event.target).value)"
+        >
+          <option value="" disabled>Seleccioná una categoría</option>
+
+          @for (workerCategory of categories(); track workerCategory) {
+          <option [value]="workerCategory">{{ getCategoryLabel(workerCategory) }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="priceType"> Tipo de precio </label>
+
+          <select
+            id="priceType"
+            [value]="priceType() ?? ''"
+            (change)="updatePriceType($any($event.target).value)"
+          >
+            <option value="" disabled>Seleccioná una opción</option>
+
+            <option [value]="PriceType.FIXED">Precio fijo</option>
+
+            <option [value]="PriceType.NEGOTIABLE">Precio a convenir</option>
+
+            <option [value]="PriceType.HOURLY">Por hora</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="basePrice">
+            Precio base
+            <span>(opcional)</span>
+          </label>
+
+          <input
+            id="basePrice"
+            type="number"
+            min="0"
+            step="0.01"
+            [value]="basePrice() ?? ''"
+            (input)="updateBasePrice($any($event.target).value)"
+            placeholder="Ej. $15000"
+          />
+        </div>
+      </div>
+
+      <!-- IMÁGENES -->
+
+      <div class="form-field">
+        <div class="field-label-row">
+          <label>Fotos del servicio</label>
+          <span>{{ images().length }}/5</span>
+        </div>
+
+        <p class="field-help">
+          Mostrá trabajos realizados o imágenes relacionadas con el servicio.
+        </p>
+
+        @if (images().length > 0) {
+
+        <div class="image-grid">
+          @for (image of images(); track image.url; let index = $index) {
+
+          <div class="image-preview">
+            <img [src]="image.url" [alt]="'Imagen ' + (index + 1) + ' del servicio'" />
+
+            <button
+              type="button"
+              class="image-preview__remove"
+              (click)="removeImage(index)"
+              [attr.aria-label]="'Eliminar imagen ' + (index + 1)"
+            >
+              <lucide-icon [img]="icons.X" [size]="16" [strokeWidth]="2.2" aria-hidden="true" />
+            </button>
+          </div>
+
+          }
+        </div>
+
+        } @if (images().length < 5) {
+
+        <label class="image-upload">
+          <input type="file" accept="image/*" multiple (change)="onImagesSelected($event)" />
+
+          <lucide-icon [img]="icons.ImagePlus" [size]="24" [strokeWidth]="1.8" aria-hidden="true" />
+
+          <strong>Agregar fotos</strong>
+
+          <span> Podés seleccionar hasta 5 imágenes. </span>
+        </label>
+
+        }
+      </div>
+
+      @if (errorMessage()) {
+
+      <div class="form-error" role="alert">{{ errorMessage() }}</div>
+
+      }
+
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="goBack()" [disabled]="publishing()">
+          Cancelar
+        </button>
+
+        <button type="button" class="primary-button" (click)="publish()" [disabled]="!canPublish()">
+          @if (publishing()) {
+
+          <span class="button-spinner" aria-hidden="true"></span>
+          <span>Publicando...</span>
+
+          } @else {
+
+          <lucide-icon [img]="icons.Send" [size]="18" [strokeWidth]="2" aria-hidden="true" />
+
+          <span>Publicar servicio</span>
+
+          }
+        </button>
+      </div>
+    </section>
+
+    <!-- PREVIEW -->
+
+    <aside class="preview-card">
+      <div class="preview-card__header">
+        <span class="eyebrow">VISTA PREVIA</span>
+        <h2>Así se verá tu servicio</h2>
+      </div>
+
+      <article class="service-preview">
+        @if (images().length > 0) {
+
+        <img
+          class="service-preview__image"
+          [src]="images()[0].url"
+          [alt]="title() || 'Vista previa del servicio'"
+        />
+
+        } @else {
+
+        <div class="service-preview__image service-preview__image--placeholder" aria-hidden="true">
+          <lucide-icon [img]="icons.Wrench" [size]="32" [strokeWidth]="1.7" />
+        </div>
+
+        }
+
+        <div class="service-preview__body">
+          <div class="request-card__top">
+            @if (category()) {
+            <span class="category"> {{ getCategoryLabel(category()!) }} </span>
+            }
+
+            <span class="status" data-active="true"> Activo </span>
+          </div>
+
+          <h3>{{ title() || 'Título de tu servicio' }}</h3>
+
+          <p class="description">
+            {{ description() || 'Acá aparecerá la descripción de tu servicio.' }}
+          </p>
+
+          <div class="service-preview__price">
+            @if (basePrice() !== null) {
+            <strong> Desde ${{ basePrice() }} </strong>
+            } @else {
+            <strong>Precio a consultar</strong>
+            } @if (priceType()) {
+            <span> {{ getPriceTypeLabel(priceType()!) }} </span>
+            }
+          </div>
+        </div>
+      </article>
+    </aside>
+  </div>
+
+  }
+</section>

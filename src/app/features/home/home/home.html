@@ -1,0 +1,296 @@
+<div class="home">
+  <!-- HERO FULLSCREEN -->
+  <section class="hero-fullscreen">
+    <div class="hero-track" [style.transform]="'translateX(-' + activeSlide() * 100 + '%)'">
+      @for (slide of heroSlides; track slide.title) {
+
+      <div class="hero-slide">
+        <img class="hero-background" [src]="slide.image" alt="" />
+
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+          <h1>{{ slide.title }}</h1>
+
+          <p>{{ slide.subtitle }}</p>
+
+          <div class="hero-actions">
+            @if (activeSlide() === 0) {
+
+            <button class="primary-btn" (click)="goToWorkers()">Buscar profesionales</button>
+
+            <button class="secondary-btn" (click)="goToBecomeWorker()">
+              Quiero trabajar en Fixy
+            </button>
+
+            } @if (activeSlide() === 1) {
+
+            <button class="primary-btn" (click)="goToWorkers()">Ver profesionales</button>
+
+            <button class="secondary-btn" (click)="goToHowItWorks()">Cómo funciona</button>
+
+            } @if (activeSlide() === 2) {
+
+            <button class="primary-btn" (click)="goToAbout()">Conocenos</button>
+
+            <button class="secondary-btn" (click)="goToCategories()">Explorar oficios</button>
+
+            }
+          </div>
+        </div>
+      </div>
+
+      }
+    </div>
+
+    <!-- HERO ARROWS -->
+    <button class="hero-arrow left" (click)="prevSlide()" aria-label="Anterior">
+      <lucide-icon [img]="ChevronLeftIcon" [size]="24"></lucide-icon>
+    </button>
+
+    <button class="hero-arrow right" (click)="nextSlide()" aria-label="Siguiente">
+      <lucide-icon [img]="ChevronRightIcon" [size]="24"></lucide-icon>
+    </button>
+
+    <!-- HERO DOTS -->
+    <div class="hero-dots">
+      @for (slide of heroSlides; track slide.title; let i = $index) {
+
+      <button
+        class="dot"
+        [class.active]="i === activeSlide()"
+        (click)="goToSlide(i)"
+        [attr.aria-label]="'Ir al slide ' + (i + 1)"
+      ></button>
+
+      }
+    </div>
+  </section>
+
+  <!-- TODO EL CONTENIDO NORMAL -->
+
+  <div class="home-container">
+    <section id="about-fixy" class="about-fixy"></section>
+
+    <!-- CTA TRABAJADOR -->
+    <section class="worker-banner">
+      <div>
+        <h2>¿Sos un profesional de oficios?</h2>
+
+        <p>Unite a Fixy, conseguí clientes cerca tuyo y hacé crecer tu negocio.</p>
+      </div>
+
+      <button (click)="goToBecomeWorker()">Quiero ser trabajador</button>
+    </section>
+
+    <!-- SERVICIOS DESTACADOS -->
+    <section id="featured-workers" class="featured" appScrollReveal>
+      <h2>Servicios destacados</h2>
+
+      <p class="featured-subtitle">Descubrí servicios ofrecidos por profesionales verificados.</p>
+
+      <!-- CATEGORIAS -->
+      <div class="category-tabs">
+        @for (category of categories; track category.value) {
+
+        <button
+          class="tab"
+          [class.active]="selectedCategory().value === category.value"
+          (click)="selectCategory(category)"
+        >
+          {{ category.label }}
+        </button>
+
+        }
+      </div>
+
+      <!-- LOADING -->
+      @if (loading()) {
+
+      <div class="service-grid">
+        @for (item of [1, 2, 3, 4]; track item) {
+
+        <div class="service-card skeleton">
+          <div class="skeleton-image"></div>
+
+          <div class="service-info">
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+          </div>
+        </div>
+
+        }
+      </div>
+
+      }
+
+      <!-- EMPTY -->
+      @else if (serviceOfferings().length === 0) {
+
+      <div class="empty-state">
+        <div class="empty-icon">
+          <lucide-icon [img]="BriefcaseBusinessIcon" [size]="32"></lucide-icon>
+        </div>
+
+        <p class="empty-title">Todavía no hay servicios publicados en esta categoría</p>
+
+        <p class="empty-subtitle">
+          Pronto habrá nuevos servicios ofrecidos por profesionales de Fixy.
+        </p>
+
+        <div class="invite-card">
+          <p class="invite-title">
+            ¿Ofrecés servicios de {{ selectedCategory().label.toLowerCase() }}?
+          </p>
+
+          <p class="invite-text">Unite a Fixy y empezá a mostrar tus servicios.</p>
+
+          <button (click)="goToBecomeWorker()">Publicar mis servicios</button>
+        </div>
+      </div>
+
+      }
+
+      <!-- SERVICIOS -->
+      @else {
+
+      <div class="service-grid">
+        @for (service of serviceOfferings(); track service.id) {
+
+        <article class="service-card" (click)="goToServiceOffering(service.id)">
+          <!-- IMAGEN / COVER -->
+          <div class="service-image">
+            @if (service.imageUrls.length > 0) {
+
+            <img [src]="service.imageUrls[0]" [alt]="service.title" />
+
+            } @else {
+
+            <span class="service-category-icon">
+              <lucide-icon [img]="WrenchIcon" [size]="34"></lucide-icon>
+            </span>
+
+            } @if (service.workerVerified) {
+
+            <span class="verified-badge">
+              <lucide-icon [img]="BadgeCheckIcon" [size]="14"></lucide-icon>
+
+              Verificado
+            </span>
+
+            }
+
+            <button
+              type="button"
+              class="favorite-button"
+              [class.active]="isFavorite(service.id)"
+              (click)="toggleFavorite(service.id, $event)"
+              [attr.aria-label]="
+    isFavorite(service.id)
+      ? 'Quitar de favoritos'
+      : 'Agregar a favoritos'
+  "
+            >
+              <lucide-icon [img]="HeartIcon" [size]="19" />
+            </button>
+          </div>
+
+          <!-- INFORMACIÓN -->
+          <div class="service-info">
+            <span class="service-category"> {{ service.category }} </span>
+
+            <h3 class="service-title">{{ service.title }}</h3>
+
+            @if (service.description) {
+
+            <p class="service-description">{{ service.description }}</p>
+
+            }
+
+            <!-- PRECIO -->
+            <div class="service-price">
+              @if (service.basePrice != null) {
+
+              <strong> Desde ${{ service.basePrice | number:'1.0-0' }} </strong>
+
+              } @else {
+
+              <strong> Precio a consultar </strong>
+
+              }
+            </div>
+
+            <!-- PROFESIONAL -->
+            <div class="service-provider">
+              <div class="provider-avatar">
+                @if (service.workerProfilePhotoUrl) {
+
+                <img [src]="service.workerProfilePhotoUrl" [alt]="service.workerFullName" />
+
+                } @else {
+
+                <lucide-icon [img]="UserRoundIcon" [size]="18"></lucide-icon>
+
+                }
+              </div>
+
+              <div class="provider-info">
+                <p class="provider-name">{{ service.workerFullName }}</p>
+
+                <div class="provider-meta">
+                  @if ( service.workerRating != null && service.workerRating > 0 ) {
+
+                  <span class="provider-rating">
+                    <lucide-icon [img]="StarIcon" [size]="13"></lucide-icon>
+
+                    {{ service.workerRating.toFixed(1) }}
+                  </span>
+
+                  } @else {
+
+                  <span class="provider-rating"> Nuevo </span>
+
+                  } @if (service.workerVerified) {
+
+                  <span class="provider-verified">
+                    <lucide-icon [img]="BadgeCheckIcon" [size]="13"></lucide-icon>
+
+                    Verificado
+                  </span>
+
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        }
+      </div>
+
+      }
+    </section>
+
+    <!-- COMO FUNCIONA -->
+    <section id="how-it-works" class="how-it-works" appScrollReveal>
+      <h2>¿Cómo funciona?</h2>
+
+      <div class="steps">
+        @for (step of steps; track step.number) {
+
+        <div class="step">
+          <div class="step-number">{{ step.number }}</div>
+
+          <h3>{{ step.title }}</h3>
+
+          <p>{{ step.description }}</p>
+        </div>
+
+        }
+      </div>
+    </section>
+  </div>
+
+  <app-footer></app-footer>
+</div>

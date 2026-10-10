@@ -1,0 +1,67 @@
+<section class="publish-request">
+  <div class="publish-request__container">
+    @if (request(); as request) {
+    <header class="publish-request__header">
+      <span class="eyebrow">Último paso</span>
+
+      <h1>Revisá tu solicitud</h1>
+
+      <p>Confirmá que los datos estén correctos antes de publicarla.</p>
+    </header>
+
+    <div class="request-preview">
+      <div class="request-preview__header">
+        <div>
+          <span class="request-preview__label">Solicitud</span>
+          <h2>{{ request.title }}</h2>
+        </div>
+
+        <div class="request-preview__status">
+          <lucide-icon [img]="icons.CheckCircle" [size]="18"></lucide-icon>
+
+          Lista para publicar
+        </div>
+      </div>
+
+      <div class="request-preview__section">
+        <span class="request-preview__label"> Categoría </span>
+
+        <p>{{ getCategoryLabel(request.category) }}</p>
+      </div>
+
+      <div class="request-preview__section">
+        <span class="request-preview__label"> Descripción </span>
+
+        <p class="request-preview__description">{{ request.description }}</p>
+      </div>
+
+      <div class="request-preview__notice">
+        <lucide-icon [img]="icons.Send" [size]="18"></lucide-icon>
+
+        <div>
+          <strong>¿Qué pasa después?</strong>
+
+          <p>
+            Tu solicitud quedará abierta para que profesionales verificados puedan verla y enviarte
+            propuestas.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    @if (errorMessage(); as error) {
+    <div class="error-message">{{ error }}</div>
+    }
+
+    <div class="publish-request__actions">
+      <button type="button" class="secondary-button" (click)="goBack()" [disabled]="publishing()">
+        Volver
+      </button>
+
+      <button type="button" class="primary-button" (click)="publish()" [disabled]="publishing()">
+        @if (publishing()) { Publicando.. } @else { Publicar solicitud }
+      </button>
+    </div>
+    }
+  </div>
+</section>

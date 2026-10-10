@@ -1,0 +1,108 @@
+<section class="favorites-page">
+  <header class="favorites-header">
+    <button class="back-button" type="button" (click)="goBack()" aria-label="Volver">
+      <lucide-icon [img]="icons.ArrowLeft" [size]="18" />
+      Volver
+    </button>
+
+    <div class="header-content">
+      <div class="title-row">
+        <lucide-icon [img]="icons.Heart" [size]="28" class="title-icon" />
+
+        <h1>Favoritos</h1>
+      </div>
+
+      <p>Guardá los servicios que más te interesan para encontrarlos fácilmente.</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+
+  <div class="state-card">
+    <div class="spinner"></div>
+    <p>Cargando tus favoritos...</p>
+  </div>
+
+  } @else if (!hasFavorites()) {
+
+  <div class="empty-state">
+    <div class="empty-icon">
+      <lucide-icon [img]="icons.HeartOff" [size]="32" />
+    </div>
+
+    <h2>Todavía no tenés favoritos</h2>
+
+    <p>Cuando encuentres un servicio que te guste, tocá el corazón para guardarlo acá.</p>
+
+    <button type="button" class="primary-button" (click)="goBack()">Explorar servicios</button>
+  </div>
+
+  } @else {
+
+  <div class="favorites-grid">
+    @for (offering of offerings(); track offering.id) {
+
+    <article class="service-card" (click)="openOffering(offering.id)">
+      <div class="image-wrapper">
+        @if (offering.imageUrls.length > 0) {
+        <img [src]="offering.imageUrls[0]" [alt]="offering.title" />
+        } @else {
+        <div class="image-placeholder">Sin imagen</div>
+        }
+
+        <button
+          type="button"
+          class="favorite-button"
+          [class.active]="isFavorite(offering.id)"
+          (click)="toggleFavorite(offering.id, $event)"
+          [attr.aria-label]="
+                isFavorite(offering.id)
+                  ? 'Quitar de favoritos'
+                  : 'Agregar a favoritos'
+              "
+        >
+          <lucide-icon [img]="icons.Heart" [size]="19" />
+        </button>
+      </div>
+
+      <div class="service-content">
+        <div class="category">{{ getCategoryLabel(offering.category) }}</div>
+
+        <h2>{{ offering.title }}</h2>
+
+        <p class="description">{{ offering.description }}</p>
+
+        <div class="worker">
+          @if (offering.workerProfilePhotoUrl) {
+          <img [src]="offering.workerProfilePhotoUrl" [alt]="offering.workerFullName" />
+          } @else {
+          <div class="worker-placeholder"></div>
+          }
+
+          <div class="worker-info">
+            <span>{{ offering.workerFullName }}</span>
+
+            @if (offering.workerVerified) {
+            <lucide-icon [img]="icons.BadgeCheck" [size]="15" />
+            }
+          </div>
+        </div>
+
+        <div class="service-footer">
+          <strong> {{ getPrice(offering) }} </strong>
+
+          @if (offering.workerRating !== null) {
+          <span class="rating">
+            <lucide-icon [img]="icons.Star" [size]="15" />
+            {{ offering.workerRating | number:'1.1-1' }}
+          </span>
+          }
+        </div>
+      </div>
+    </article>
+
+    }
+  </div>
+
+  }
+</section>

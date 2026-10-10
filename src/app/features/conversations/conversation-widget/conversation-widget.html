@@ -1,0 +1,117 @@
+@if (open()) {
+<div class="widget-panel">
+  <header class="widget-header">
+    <div class="header-title">
+      <strong>Mensajes</strong>
+
+      @if (unreadCount() > 0) {
+      <span class="header-unread"> {{ unreadCount() }} sin leer </span>
+      }
+    </div>
+
+    <button type="button" class="close-button" aria-label="Cerrar mensajes" (click)="close()">
+      <lucide-icon [img]="icons.X" [size]="18" />
+    </button>
+  </header>
+
+  <div class="widget-body">
+    @if (loading()) {
+    <div class="widget-state">
+      <div class="spinner"></div>
+      <span>Cargando mensajes...</span>
+    </div>
+    } @if (!loading() && error()) {
+    <div class="widget-state error">
+      <span>{{ error() }}</span>
+
+      <button type="button" class="retry-button" (click)="loadConversations()">Reintentar</button>
+    </div>
+    } @if (!loading() && !error() && !hasConversations()) {
+    <div class="widget-state empty">
+      <div class="empty-icon">
+        <lucide-icon [img]="icons.MessageCircle" [size]="22" />
+      </div>
+
+      <strong>No tenés mensajes todavía</strong>
+
+      <span> Tus conversaciones van a aparecer acá. </span>
+    </div>
+    } @if (!loading() && !error() && hasConversations()) {
+    <div class="conversation-items">
+      @for ( conversation of conversations(); track conversation.conversationId ) {
+      <button
+        type="button"
+        class="conversation-item"
+        [class.unread]="isUnread(conversation)"
+        (click)="openConversation(conversation)"
+      >
+        <div class="conversation-avatar" [ngClass]="getAvatarClass(getCounterpartName(conversation))">
+          @if (getCounterpartPhotoUrl(conversation); as photoUrl) {
+              <img [src]="photoUrl" alt="" loading="lazy" />
+            } @else if (getCounterpartName(conversation)) { {{ getCounterpartInitial(conversation) }} } @else {
+          <lucide-icon [img]="icons.MessageCircle" [size]="19" />
+          }
+        </div>
+
+        <div class="conversation-content">
+          <div class="conversation-top">
+            <strong>{{ getCounterpartName(conversation) }}</strong>
+
+            @if (isUnread(conversation)) {
+            <span class="unread-dot"></span>
+            }
+          </div>
+
+          @if (getConversationContext(conversation)) {
+          <span
+            class="conversation-context"
+            [ngClass]="getConversationContextClass(conversation)"
+            [title]="getConversationContext(conversation)"
+          >
+            {{ getConversationContext(conversation) }}
+          </span>
+          }
+
+          <span class="conversation-preview"> {{ getPreview(conversation) }} </span>
+        </div>
+      </button>
+      }
+    </div>
+    }
+  </div>
+
+  @if (hasConversations()) {
+  <button type="button" class="view-all-button" (click)="openAllConversations()">
+    Ver todos los mensajes
+
+    <lucide-icon [img]="icons.ArrowRight" [size]="16" />
+  </button>
+  }
+</div>
+}
+
+<!-- =========================================================
+     TRIGGER (botón que abre/cierra el panel)
+     ========================================================= -->
+<button
+  type="button"
+  class="widget-trigger"
+  [class.active]="open()"
+  aria-label="Mensajes"
+  (click)="toggle()"
+>
+  <!-- Avatar con inicial + dot online -->
+  <div class="widget-trigger-avatar" [ngClass]="getAvatarClass(triggerName())">
+    {{ triggerInitial() }}
+  </div>
+
+  <!-- Texto: ahora solo "Mensajes" en una línea -->
+  <div class="widget-trigger-text">
+    <strong>Mensajes</strong>
+  </div>
+
+  <!-- Badge de no leídos -->
+  @if (unreadCount() > 0 && !open()) {
+  <span class="notification-badge"> {{ unreadCount() }} </span>
+  }
+</button>

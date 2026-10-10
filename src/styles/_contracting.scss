@@ -1,0 +1,348 @@
+@use '../app/shared/styles/variables' as fx;
+
+.fx-contract {
+  --fx-primary: #{fx.$primary};
+  --fx-primary-soft: #{fx.$primary-light};
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+  color: fx.$text-main;
+  overflow-wrap: anywhere;
+  h2,
+  h3,
+  p,
+  dl {
+    margin: 0;
+  }
+  h2 {
+    font-size: 24px;
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+  h3 {
+    font-size: 16px;
+    line-height: 1.4;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  p {
+    color: fx.$text-secondary;
+    line-height: 1.65;
+    font-size: 14px;
+  }
+  .fx-card {
+    display: grid;
+    gap: 16px;
+    padding: 24px;
+    border: 1px solid fx.$border;
+    border-radius: fx.$radius-lg;
+    background: fx.$white;
+    box-shadow: fx.$shadow-sm;
+  }
+  .fx-row,
+  .fx-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .fx-row {
+    justify-content: space-between;
+  }
+  .fx-actions {
+    justify-content: flex-start;
+  }
+  .fx-row > div {
+    min-width: 0;
+  }
+  .fx-row > div > p {
+    margin-top: 6px;
+  }
+  .fx-eyebrow {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--fx-primary);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .fx-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 11px 18px;
+    border: 1px solid transparent;
+    border-radius: fx.$radius-md;
+    background: var(--fx-primary);
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background 150ms ease,
+      border-color 150ms ease;
+  }
+  .fx-button:hover:not(:disabled) {
+    background: fx.$primary-dark;
+  }
+  .fx-button.secondary {
+    border-color: fx.$border;
+    background: #fff;
+    color: fx.$text-main;
+  }
+  .fx-button.secondary:hover:not(:disabled) {
+    background: fx.$background;
+    border-color: #cbd5e1;
+  }
+  .fx-button.danger {
+    border-color: #fecaca;
+    background: #fff;
+    color: #b91c1c;
+  }
+  .fx-button.danger:hover:not(:disabled) {
+    background: #fff1f2;
+  }
+  .fx-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .fx-button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  summary:focus-visible {
+    outline: 3px solid #a6c4fa;
+    outline-offset: 3px;
+  }
+  .fx-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    color: var(--fx-primary);
+    background: var(--fx-primary-soft);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .fx-badge[data-status='ACCEPTED'] {
+    color: #166534;
+    background: fx.$success-light;
+  }
+  .fx-badge[data-status='REJECTED'] {
+    color: #991b1b;
+    background: fx.$danger-light;
+  }
+  .fx-badge[data-status='SUPERSEDED'] {
+    color: fx.$text-secondary;
+    background: fx.$border-light;
+  }
+  .fx-amount {
+    color: fx.$text-main;
+    font-size: 28px;
+    font-weight: 750;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+  }
+  .fx-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  label {
+    display: grid;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  input,
+  textarea,
+  select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    padding: 12px 14px;
+    border: 1px solid fx.$border;
+    border-radius: fx.$radius-md;
+    background: #fff;
+    color: fx.$text-main;
+    font: inherit;
+    font-size: 14px;
+  }
+  textarea {
+    resize: vertical;
+    line-height: 1.6;
+  }
+  details {
+    min-width: 0;
+  }
+  summary {
+    display: list-item;
+    min-height: 36px;
+    padding: 6px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: fx.$text-main;
+    cursor: pointer;
+  }
+  details > .fx-card,
+  details > p {
+    margin-top: 12px;
+  }
+  hr {
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-top: 1px solid fx.$border-light;
+  }
+  .fx-breakdown {
+    display: grid;
+    gap: 12px;
+    font-size: 14px;
+  }
+  .fx-breakdown > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .fx-breakdown dt {
+    color: fx.$text-secondary;
+  }
+  .fx-breakdown dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .fx-breakdown > div:last-child {
+    padding-top: 12px;
+    border-top: 1px solid fx.$border;
+  }
+  .fx-error {
+    padding: 16px;
+    border: 1px solid #fecaca;
+    border-radius: fx.$radius-md;
+    background: #fff7f7;
+    color: #991b1b;
+    font-size: 14px;
+  }
+  .fx-error .fx-button {
+    margin-top: 12px;
+  }
+  .fx-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 18px;
+    border: 1px solid fx.$border;
+    border-left: 3px solid var(--fx-primary);
+    border-radius: fx.$radius-md;
+    background: #f3f7fd;
+  }
+  .fx-hint strong {
+    display: block;
+    color: fx.$text-main;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .fx-hint p {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .fx-hint button {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    margin: -4px -4px 0 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: fx.$text-secondary;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .fx-hint button:hover {
+    background: fx.$primary-light;
+  }
+}
+.fx-payments-page {
+  width: min(1200px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 40px 0 80px;
+}
+.commercial-context .fx-contract {
+  gap: 16px;
+}
+.commercial-context .fx-contract h2 {
+  font-size: 18px;
+}
+.commercial-context .fx-contract .fx-card {
+  padding: 16px;
+  gap: 12px;
+  box-shadow: none;
+}
+.commercial-context .fx-contract .fx-amount {
+  font-size: 24px;
+}
+@media (max-width: 600px) {
+  .fx-contract {
+    gap: 16px;
+  }
+  .fx-contract h2 {
+    font-size: 20px;
+  }
+  .fx-contract .fx-grid {
+    grid-template-columns: 1fr;
+  }
+  .fx-contract .fx-card {
+    padding: 20px;
+  }
+  .fx-contract .fx-actions > .fx-button {
+    flex: 1 1 auto;
+  }
+  .fx-contract .fx-row {
+    align-items: flex-start;
+  }
+  .fx-contract .fx-amount {
+    font-size: 24px;
+  }
+  .fx-payments-page {
+    width: calc(100% - 32px);
+    padding-top: 24px;
+  }
+}
+
+/* Keep account controls reachable; the measured navbar height owns page spacing. */
+.navbar-inner { padding-inline:24px; box-sizing:border-box; }
+@media(max-width:768px){
+ .navbar-inner { padding-inline:16px;gap:12px;flex-wrap:wrap; }
+ .info-header { flex:0 0 auto; }
+ .navbar-inner > app-address-selector { flex:1;min-width:0; }
+ .user-section,.auth-section { margin-left:auto;flex-shrink:0; }
+ .search-bar { order:3;flex:1 0 100%;min-width:0;margin:0; }
+ .search-field { min-width:0;flex:1;padding:10px 12px; }
+ .search-input { min-width:0; }
+ .search-input input { width:100%;min-width:0; }
+ .search-value { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+ .category-panel { left:0;max-width:calc(100vw - 32px); }
+ .auth-section .btn-primary { padding:8px 10px; }
+ .search-label { font-size:12px; }
+}
+@media(max-width:768px){
+ .user-section { display:flex;align-items:center;gap:2px; }
+ .auth-section { display:flex;gap:4px; }
+ .auth-section .btn-text { padding:8px 4px;font-size:12px; }
+}
+/* Contract screens reserve the navbar's real layout space, including transitions. */
+.app-container:has(> .page-content.managed-layout) > app-navbar { position:sticky;top:0;z-index:1000;display:block; }
+.app-container:has(> .page-content.managed-layout) > app-navbar .navbar { position:relative; }
+body .app-container > .page-content.managed-layout { padding-top:0; }

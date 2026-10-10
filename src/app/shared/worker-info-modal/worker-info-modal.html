@@ -1,0 +1,127 @@
+@if (isOpen) {
+<dialog
+  #infoDialog
+  class="modal-overlay"
+  aria-labelledby="worker-info-title"
+  aria-describedby="worker-info-description"
+  (cancel)="$event.preventDefault(); close()"
+  (click)="close()"
+>
+  <section
+    class="modal"
+    cdkTrapFocus
+    [cdkTrapFocusAutoCapture]="true"
+    (keydown.escape)="close()"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="modal-header">
+      <div>
+        <span class="eyebrow">Profesionales en Fixy</span>
+        <h2 id="worker-info-title">Antes de continuar</h2>
+        <p id="worker-info-description">
+          Conocé qué implica ofrecer tus servicios y gestionar una contratación en la plataforma.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="close-btn"
+        aria-label="Cerrar información"
+        cdkFocusInitial
+        (click)="close()"
+      >
+        <lucide-angular [img]="XIcon" size="20" aria-hidden="true"></lucide-angular>
+      </button>
+    </header>
+
+    <div class="modal-body" tabindex="0" role="region" aria-label="Información para profesionales">
+      <section class="info-section">
+        <h3>Tu actividad profesional</h3>
+        <p>
+          Ofrecés tus servicios a los clientes a través de Fixy. Usar la plataforma no supone, por
+          sí solo, una relación laboral con Fixy. Conservás la responsabilidad sobre la prestación
+          del trabajo contratado.
+        </p>
+      </section>
+
+      <section class="info-section">
+        <h3>Tu perfil y tus servicios</h3>
+        <ul>
+          <li>
+            Proporcioná información verdadera, actualizada y propia. La documentación solicitada
+            puede ayudar a revisar tu perfil e identidad y la seguridad de tu cuenta.
+          </li>
+          <li>
+            Publicá servicios reales, con información correcta y dentro de las categorías admitidas.
+            Evitá contenido engañoso o ilegal y ofrecé trabajos que tengas capacidad de realizar.
+          </li>
+          <li>
+            Contá con matrícula, licencia o habilitación cuando la actividad o normativa aplicable
+            lo requiera.
+          </li>
+        </ul>
+      </section>
+
+      <section class="info-section">
+        <h3>Presupuestos y acuerdos</h3>
+        <p>
+          Describí con claridad el alcance, el precio y las condiciones del trabajo. El presupuesto
+          aceptado y el acuerdo de servicio registran lo pactado: los datos importantes, como el
+          precio final, no deben quedar únicamente en el chat.
+        </p>
+      </section>
+
+      <section class="info-section protection">
+        <h3>Pagos y Garantía Fixy</h3>
+        <p>
+          Determinadas contrataciones pueden gestionarse mediante pagos dentro de Fixy. El pago
+          puede permanecer protegido durante el período correspondiente.
+        </p>
+        <p>
+          Completar el trabajo no implica una liquidación inmediata. La liberación de fondos puede
+          requerir validaciones y quedar pendiente si hay reclamos que deban resolverse.
+        </p>
+      </section>
+
+      <section class="info-section">
+        <h3>Responsabilidad y conducta</h3>
+        <p>
+          Sos responsable por la calidad, legalidad y correcta ejecución del servicio. Fixy facilita
+          el contacto, la contratación, la comunicación y el flujo de pago; el trabajo lo realiza el
+          profesional.
+        </p>
+        <p>
+          Tratá a las personas con respeto, cumplí lo acordado y respetá la seguridad y normativa
+          aplicable. No utilices la plataforma para fraude, suplantación de identidad o prácticas
+          abusivas.
+        </p>
+        <p>
+          Fixy puede limitar o suspender el acceso profesional ante incumplimientos o problemas de
+          seguridad.
+        </p>
+      </section>
+
+      <section class="info-section">
+        <h3>Uso de tus datos</h3>
+        <p>
+          Los datos personales y la documentación solicitados pueden utilizarse para operar la
+          cuenta, revisar el perfil y atender cuestiones de seguridad y verificación, según
+          corresponda.
+        </p>
+      </section>
+    </div>
+
+    <footer class="modal-footer">
+      <p>
+        Este aviso resume las pautas para operar como profesional en Fixy. Al continuar, accedés al
+        registro.
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="close()">Cancelar</button>
+        <button type="button" class="btn-primary" routerLink="/become-worker">
+          Entiendo y continuar
+        </button>
+      </div>
+    </footer>
+  </section>
+</dialog>
+}

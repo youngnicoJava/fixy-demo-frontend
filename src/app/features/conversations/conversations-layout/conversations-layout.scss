@@ -1,0 +1,48 @@
+:host {
+  display: block;
+  width: 100%;
+  height: calc(100dvh - var(--fixy-navbar-height,112px));
+  overflow: hidden;
+  background: #fafafa;
+  margin-top: 0;
+}
+
+.conversations-layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+
+  width: 100%;
+  height: 100%;
+}
+
+.conversations-sidebar {
+  overflow-y: auto;
+
+  border-right: 1px solid #e7e9ed;
+
+  background: #fff;
+}
+
+.conversations-main {
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: #fafafa;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .conversations-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* Si hay chat activo, ocultamos la lista (deep-link friendly) */
+  .conversations-layout:has(app-conversation) .conversations-sidebar {
+    display: none;
+  }
+}

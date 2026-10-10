@@ -1,0 +1,752 @@
+<section class="request-detail">
+  @if (loading()) {
+
+  <div class="page-state">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Cargando solicitud...</p>
+  </div>
+
+  } @else if (error() || !request()) {
+
+  <div class="page-state page-state--error">
+    <div class="state-icon">!</div>
+
+    <h2>No pudimos cargar esta solicitud</h2>
+
+    <p>La solicitud puede no existir o ya no estar disponible para tu cuenta.</p>
+
+    <button type="button" class="primary-button" (click)="goBack()">Volver</button>
+  </div>
+
+  } @else { @if (request(); as currentRequest) {
+
+  <!-- =================================================
+       HEADER
+       ================================================= -->
+
+  <header class="detail-header">
+    <div class="header-main">
+      <div class="header-meta">
+        <span class="category"> {{ getCategoryLabel(currentRequest.category) }} </span>
+
+        <span class="status" [attr.data-status]="currentRequest.status">
+          {{ getStatusLabel(currentRequest.status) }}
+        </span>
+      </div>
+
+      <h1>{{ currentRequest.title }}</h1>
+
+      <p class="created-date">Publicada el {{ formatDate(currentRequest.createdAt) }}</p>
+    </div>
+  </header>
+
+  <!-- =================================================
+       CONTENT
+       ================================================= -->
+
+  <div class="detail-layout">
+    <main class="detail-main">
+      @if(currentRequest.selectedProposal){
+        <app-contract-panel [requestId]="currentRequest.id" [requestStatus]="currentRequest.status" (changed)="loadRequest()" (paymentConfirmed)="paymentHeld.set($event)" />
+      }
+      <!-- REQUEST INFO -->
+
+      <section class="detail-card">
+        <div class="card-heading">
+          <div>
+            <span class="eyebrow"> SOLICITUD </span>
+
+            <h2>¿Qué necesitás?</h2>
+          </div>
+        </div>
+
+        <p class="request-description">{{ currentRequest.description }}</p>
+
+        <div class="request-location">
+          <div class="location-icon">
+            <lucide-icon [img]="icons.MapPin" [size]="19" [strokeWidth]="2" aria-hidden="true" />
+          </div>
+
+          <div>
+            <span> Ubicación </span>
+
+            <strong> {{ currentRequest.address }} </strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================
+           PUBLIC COMMENTS
+           ================================================= -->
+
+      <section class="detail-card comments-card">
+        <div class="card-heading">
+          <div>
+            <span class="eyebrow"> CONVERSACIÓN PÚBLICA </span>
+
+            <h2>Preguntas y comentarios</h2>
+
+            <p class="card-subtitle">
+              Aclaraciones sobre el trabajo antes de elegir una propuesta.
+            </p>
+          </div>
+
+          @if (comments().length > 0) {
+          <span class="count"> {{ comments().length }} </span>
+          }
+        </div>
+
+        @if (commentsLoading()) {
+
+        <div class="comments-loading">
+          <div class="button-spinner"></div>
+          <span>Cargando comentarios...</span>
+        </div>
+
+        } @else {
+
+        @if (comments().length > 0) {
+
+        <div class="comments-list">
+          @for (comment of comments(); track comment.id) {
+
+          <article
+            class="comment"
+            [class.comment--reply]="comment.parentCommentId !== null"
+          >
+            <div class="comment-avatar">{{ comment.authorName.charAt(0).toUpperCase() }}</div>
+
+            <div class="comment-content">
+              <div class="comment-header">
+                <div class="comment-author">
+                  <strong>{{ comment.authorName }}</strong>
+
+                  @if (comment.requestAuthor) {
+                    <span class="comment-author-badge">AUTOR</span>
+                  } @else {
+                    <span class="comment-role">
+                      {{ comment.authorRole }}
+                    </span>
+                  }
+
+                  <time [attr.datetime]="comment.createdAt">
+                    · {{ formatDate(comment.createdAt) }}
+                  </time>
+                </div>
+              </div>
+
+              <p class="comment-text">
+                {{ comment.content }}
+              </p>
+
+              @if (isOpen()) {
+                <div class="comment-actions">
+                  <button
+                    type="button"
+                    class="comment-action"
+                    (click)="startReply(comment.id)"
+                  >
+                    Responder
+                  </button>
+                </div>
+              }
+
+              @if (replyingTo() === comment.id) {
+
+                <div class="reply-composer">
+                  <div class="comment-composer">
+                    <div class="comment-composer__top">
+                      <div class="comment-avatar comment-avatar--small">
+                        {{ currentUser()?.fullName?.charAt(0)?.toUpperCase() ?? '?' }}
+                      </div>
+
+                      <textarea
+                        rows="2"
+                        maxlength="700"
+                        placeholder="Escribí una respuesta..."
+                        [value]="newComment()"
+                        [disabled]="commentSubmitting()"
+                        (input)="onCommentInput($event)"
+                      ></textarea>
+                    </div>
+
+                    @if (newComment().trim().length > 0) {
+
+                      <div class="comment-composer__actions">
+                        <button
+                          type="button"
+                          class="comment-cancel"
+                          (click)="cancelReply()"
+                        >
+                          Cancelar
+                        </button>
+
+                        <button
+                          type="button"
+                          class="primary-button primary-button--small"
+                          [disabled]="commentSubmitting()"
+                          (click)="submitComment()"
+                        >
+                          @if (commentSubmitting()) {
+                            <span class="button-spinner"></span>
+                          } @else {
+                            <lucide-icon
+                              [img]="icons.Send"
+                              [size]="16"
+                              [strokeWidth]="2"
+                              aria-hidden="true"
+                            />
+                          }
+
+                          <span>Responder</span>
+                        </button>
+                      </div>
+
+                    }
+
+                  </div>
+                </div>
+
+              }
+
+            </div>
+          </article>
+
+          }
+        </div>
+
+        } @else {
+
+        <div class="comments-empty">
+          <div class="comments-empty__icon">
+            <lucide-icon
+              [img]="icons.MessageCircle"
+              [size]="20"
+              [strokeWidth]="2"
+              aria-hidden="true"
+            />
+          </div>
+
+          <div>
+            <strong>Todavía no hay comentarios</strong>
+
+            <p>
+              Podés hacer una pregunta o aclarar algún detalle antes de enviar o aceptar una
+              propuesta.
+            </p>
+          </div>
+        </div>
+
+        }
+
+        @if (commentsError()) {
+        <p class="comments-error">{{ commentsError() }}</p>
+        }
+
+        @if (canComment()) {
+
+        <div class="comment-form">
+          <div class="comment-composer">
+            <div class="comment-composer__top">
+              <div class="comment-avatar comment-avatar--small">
+                {{ currentUser()?.fullName?.charAt(0)?.toUpperCase() ?? '?' }}
+              </div>
+
+              <textarea
+                rows="1"
+                maxlength="700"
+                placeholder="Escribí una pregunta o comentario..."
+                [value]="newComment()"
+                [disabled]="commentSubmitting()"
+                (input)="onCommentInput($event)"
+              ></textarea>
+            </div>
+
+            <div class="comment-composer__actions">
+              <span class="character-count"> {{ newComment().length }} / 700 </span>
+
+              <button
+                type="button"
+                class="primary-button primary-button--small"
+                [disabled]="commentSubmitting() || newComment().trim().length === 0"
+                (click)="submitComment()"
+              >
+                @if (commentSubmitting()) {
+                <span class="button-spinner"></span>
+                } @else {
+                <lucide-icon [img]="icons.Send" [size]="16" [strokeWidth]="2" aria-hidden="true" />
+                }
+
+                <span>Publicar comentario</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        } @else {
+
+        @if (!isOpen()) {
+        <div class="comments-closed">
+          <lucide-icon [img]="icons.CheckCircle" [size]="17" [strokeWidth]="2" aria-hidden="true" />
+          <span> Los comentarios están cerrados porque la solicitud ya no está abierta. </span>
+        </div>
+        }
+
+        }
+
+        }
+
+      </section>
+
+      <!-- SELECTED WORKER -->
+
+      @if (showSelectedWorker()) {
+
+      <section class="detail-card">
+        <div class="card-heading">
+          <div>
+            <span class="eyebrow"> PROFESIONAL </span>
+
+            <h2>Profesional seleccionado</h2>
+          </div>
+        </div>
+
+        @if (selectedProposal(); as proposal) {
+
+        <div class="selected-worker">
+          <div class="worker-avatar">{{ proposal.workerFullName.charAt(0) }}</div>
+
+          <div class="worker-data">
+            <strong> {{ proposal.workerFullName }} </strong>
+
+            <span> {{ proposal.workerStatus }} </span>
+
+            <span class="rating">
+              <lucide-icon [img]="icons.Star" [size]="15" [strokeWidth]="2" aria-hidden="true" />
+
+              {{ proposal.workerRating ?? 'Nuevo' }}
+            </span>
+          </div>
+
+          @if (canOpenChat()) {
+            <button
+              type="button"
+              class="primary-button"
+              (click)="openChat()"
+              [disabled]="actionLoading()"
+            >
+              @if (actionLoading()) {
+                <span class="button-spinner"></span>
+              } @else {
+                <lucide-icon
+                  [img]="icons.MessageCircle"
+                  [size]="17"
+                  [strokeWidth]="2"
+                  aria-hidden="true"
+                />
+              }
+
+              <span>Hablar por chat</span>
+            </button>
+          }
+        </div>
+
+        }
+      </section>
+
+      }
+
+      <!-- CLIENT: PROPOSALS -->
+
+      @if (isClient() && isOpen()) {
+
+      <section class="detail-card">
+        <div class="card-heading">
+          <div>
+            <span class="eyebrow"> PROPUESTAS </span>
+
+            <h2>Profesionales interesados</h2>
+          </div>
+
+          <span class="count"> {{ currentRequest.proposals.length }} </span>
+        </div>
+
+        @if (currentRequest.proposals.length > 0) {
+
+        <div class="proposals-list">
+          @for ( proposal of currentRequest.proposals; track proposal.id ) {
+
+          <article class="proposal-card">
+            <div class="proposal-header">
+              <div class="worker-avatar">{{ proposal.workerFullName.charAt(0) }}</div>
+
+              <div class="worker-data">
+                <strong> {{ proposal.workerFullName }} </strong>
+
+                <span> {{ proposal.workerStatus }} </span>
+              </div>
+
+              <span class="proposal-status" [attr.data-status]="proposal.status">
+                {{ getProposalStatusLabel(proposal.status) }}
+              </span>
+            </div>
+
+            <div class="proposal-rating">
+              <lucide-icon [img]="icons.Star" [size]="15" [strokeWidth]="2" aria-hidden="true" />
+
+              <span> {{ proposal.workerRating ?? 'Nuevo' }} </span>
+            </div>
+
+            <p class="proposal-message">{{ proposal.message }}</p>
+
+            <div class="proposal-footer">
+              <div class="proposal-price">
+                <strong> {{ proposal.estimatedPrice > 0 ? (proposal.estimatedPrice | currency:'ARS':'symbol':'1.0-2') : 'A definir tras evaluar' }} </strong>
+
+                <span> {{ getPriceTypeLabel(proposal.priceType) }} </span>
+              </div>
+
+              @if ( proposal.status === ProposalStatus.PENDING ) {
+
+              <button
+                type="button"
+                class="primary-button primary-button--small"
+                [disabled]="actionLoading()"
+                (click)="selectProposal(proposal.id)"
+              >
+                <lucide-icon
+                  [img]="icons.CheckCircle"
+                  [size]="17"
+                  [strokeWidth]="2"
+                  aria-hidden="true"
+                />
+
+                <span> Seleccionar </span>
+              </button>
+
+              }
+            </div>
+          </article>
+
+          }
+        </div>
+
+        } @else {
+
+        <div class="inline-empty">
+          <p>Todavía no recibiste propuestas.</p>
+        </div>
+
+        }
+      </section>
+
+      }
+
+      <button type="button" class="icon-action back-button" (click)="goBack()">
+        <lucide-icon [img]="icons.ArrowLeft" [size]="18" [strokeWidth]="2" aria-hidden="true" />
+
+        <span>Volver</span>
+      </button>
+
+      <!-- WORKER: OWN PROPOSAL -->
+
+      @if (isWorker()) {
+
+      <section class="detail-card">
+        <div class="card-heading">
+          <div>
+            <span class="eyebrow"> TU PROPUESTA </span>
+
+            <h2>Tu participación</h2>
+          </div>
+        </div>
+
+        @if (myProposal(); as proposal) {
+
+        <div class="my-proposal">
+          <div class="my-proposal__top">
+            <div class="proposal-price">
+              <strong> {{ proposal.estimatedPrice > 0 ? (proposal.estimatedPrice | currency:'ARS':'symbol':'1.0-2') : 'A definir tras evaluar' }} </strong>
+
+              <span> {{ getPriceTypeLabel(proposal.priceType) }} </span>
+            </div>
+
+            <span class="proposal-status" [attr.data-status]="proposal.status">
+              {{ getProposalStatusLabel(proposal.status) }}
+            </span>
+          </div>
+
+          <p>{{ proposal.message }}</p>
+
+          @if ( proposal.status === ProposalStatus.PENDING && isOpen() ) {
+
+          <button
+            type="button"
+            class="secondary-button"
+            [disabled]="actionLoading()"
+            (click)="withdrawProposal()"
+          >
+            <lucide-icon [img]="icons.XCircle" [size]="17" [strokeWidth]="2" aria-hidden="true" />
+
+            <span> Retirar propuesta </span>
+          </button>
+
+          }
+        </div>
+
+        } @else if (canCreateProposal()) {
+
+        <div class="proposal-form">
+          <label><input type="checkbox" [checked]="requiresVisit()" (change)="requiresVisit.set($any($event.target).checked); proposalPriceType.set(PriceType.NEGOTIABLE)"> Necesito una visita técnica antes de presupuestar</label>
+          <div class="form-field">
+            <label for="proposal-message"> Mensaje </label>
+
+            <textarea
+              id="proposal-message"
+              rows="5"
+              maxlength="300"
+              placeholder="Contale al cliente cómo podés ayudarlo..."
+              [value]="proposalMessage()"
+              (input)="proposalMessage.set($any($event.target).value)"
+            ></textarea>
+
+            <span class="character-count"> {{ proposalMessage().length }} / 300 </span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="proposal-price"> Importe o referencia (opcional si requiere evaluación) </label>
+
+              <input
+                id="proposal-price"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="35000"
+                [value]="proposalPrice() ?? ''"
+                (input)="
+                  proposalPrice.set(
+                    $any($event.target).value
+                      ? +$any($event.target).value
+                      : null
+                  )
+                "
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="proposal-price-type"> Cómo vas a presupuestar </label>
+
+              <select
+                id="proposal-price-type"
+                [value]="proposalPriceType()"
+                (change)="proposalPriceType.set($any($event.target).value)"
+              >
+                <option [value]="PriceType.FIXED">Importe total definitivo</option>
+
+                <option [value]="PriceType.NEGOTIABLE">Evaluar y enviar presupuesto</option>
+
+
+              </select>
+            </div>
+          </div>
+
+          @if (actionError()) {
+
+          <p class="action-error">{{ actionError() }}</p>
+
+          }
+
+          <button
+            type="button"
+            class="primary-button"
+            [disabled]="actionLoading()"
+            (click)="submitProposal()"
+          >
+            @if (actionLoading()) {
+            <span class="button-spinner"></span>
+            } @else {
+            <lucide-icon [img]="icons.Send" [size]="17" [strokeWidth]="2" aria-hidden="true" />
+            }
+
+            <span> Enviar propuesta </span>
+          </button>
+        </div>
+
+        } @else {
+
+        <div class="inline-empty">
+          <p>No podés enviar una propuesta en el estado actual.</p>
+        </div>
+
+        }
+      </section>
+
+      }
+
+      <!-- TIMELINE -->
+
+      @if (currentRequest.events.length > 0) {
+
+      <section class="detail-card">
+        <div class="card-heading">
+          <div>
+            <span class="eyebrow"> HISTORIAL </span>
+
+            <h2>Actividad de la solicitud</h2>
+          </div>
+        </div>
+
+        <div class="timeline">
+          @for ( event of currentRequest.events; track event.id ) {
+
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+
+            <div class="timeline-content">
+              <strong> {{ event.description }} </strong>
+
+              <span> {{ event.actorName }} · {{ formatDate(event.createdAt) }} </span>
+            </div>
+          </div>
+
+          }
+        </div>
+      </section>
+
+      }
+    </main>
+
+    <!-- =================================================
+         SIDEBAR
+         ================================================= -->
+
+    <aside class="detail-sidebar">
+      <!-- STATUS -->
+
+      <section class="sidebar-card">
+        <span class="eyebrow"> ESTADO </span>
+
+        <div class="status-large">
+          <span class="status-dot" [attr.data-status]="currentRequest.status"></span>
+
+          <strong> {{ getStatusLabel(currentRequest.status) }} </strong>
+        </div>
+
+        @if (currentRequest.expiresAt && isOpen()) {
+
+        <div class="sidebar-info">
+          <lucide-icon [img]="icons.Clock3" [size]="16" [strokeWidth]="2" aria-hidden="true" />
+
+          <span> Expira {{ formatDate(currentRequest.expiresAt) }} </span>
+        </div>
+
+        }
+      </section>
+
+      <!-- CLIENT ACTIONS -->
+
+      @if (isClient()) {
+
+      <section class="sidebar-card actions-card">
+        <span class="eyebrow"> ACCIONES </span>
+
+        @if (canCancel()) {
+
+        <button
+          type="button"
+          class="secondary-button"
+          [disabled]="actionLoading()"
+          (click)="cancelRequest()"
+        >
+          <lucide-icon [img]="icons.XCircle" [size]="17" [strokeWidth]="2" aria-hidden="true" />
+
+          <span> Cancelar solicitud </span>
+        </button>
+
+        }
+
+        @if (isMatched() || isInProgress()) {
+
+        <button type="button" class="secondary-button" (click)="openChat()">
+          <lucide-icon
+            [img]="icons.MessageCircle"
+            [size]="17"
+            [strokeWidth]="2"
+            aria-hidden="true"
+          />
+
+          <span> Abrir chat </span>
+        </button>
+
+        }
+
+        @if (canCompleteService()) {
+
+        <button
+          type="button"
+          class="primary-button"
+          [disabled]="actionLoading()"
+          (click)="completeRequest()"
+        >
+          <lucide-icon [img]="icons.CheckCircle" [size]="17" [strokeWidth]="2" aria-hidden="true" />
+
+          <span> Confirmar finalización </span>
+        </button>
+
+        }
+      </section>
+
+      }
+
+      <!-- WORKER ACTIONS -->
+
+      @if (isWorker()) {
+
+      <section class="sidebar-card actions-card">
+        <span class="eyebrow"> ACCIONES </span>
+
+        @if (canStartService()) {
+
+        <button
+          type="button"
+          class="primary-button"
+          [disabled]="actionLoading()"
+          (click)="startService()"
+        >
+          <lucide-icon [img]="icons.CheckCircle" [size]="17" [strokeWidth]="2" aria-hidden="true" />
+
+          <span> Iniciar servicio </span>
+        </button>
+
+        }
+
+        @if (isMatched() || isInProgress()) {
+
+        <button type="button" class="secondary-button" (click)="openChat()">
+          <lucide-icon
+            [img]="icons.MessageCircle"
+            [size]="17"
+            [strokeWidth]="2"
+            aria-hidden="true"
+          />
+
+          <span> Abrir chat </span>
+        </button>
+
+        }
+      </section>
+
+      }
+
+      @if (actionError()) {
+
+      <div class="sidebar-error">{{ actionError() }}</div>
+
+      }
+
+    </aside>
+  </div>
+
+  } }
+</section>

@@ -1,0 +1,90 @@
+<section class="my-requests">
+  <div class="my-requests__container">
+    <header class="my-requests__header">
+      <div>
+        <span class="eyebrow">MIS SOLICITUDES</span>
+
+        <h1>Mis solicitudes</h1>
+        <p>Acá podés ver y seguir todas las solicitudes de servicios que publicaste.</p>
+      </div>
+      <button type="button" class="primary-button" (click)="createRequest()">
+        + Nueva solicitud
+      </button>
+    </header>
+
+    @if (loading()) {
+    <div class="state state--loading">
+      <div class="loader"></div>
+
+      <p>Cargando tus solicitudes...</p>
+    </div>
+    } @else if (error()) {
+    <div class="state state--error">
+      <h2>No pudimos cargar tus solicitudes</h2>
+
+      <p>Ocurrió un problema al obtener tus solicitudes.</p>
+
+      <button type="button" class="secondary-button" (click)="loadRequests()">
+        Intentar nuevamente
+      </button>
+    </div>
+    } @else if (!hasRequests()) {
+    <div class="state state--empty">
+      <div class="empty-icon" aria-hidden="true">+</div>
+
+      <h2>Todavía no tenés solicitudes</h2>
+
+      <p>Publicá tu primera solicitud y encontrá profesionales que puedan ayudarte.</p>
+
+      <button type="button" class="primary-button" (click)="createRequest()">
+        Crear solicitud
+      </button>
+    </div>
+    } @else {
+    <div class="requests-list">
+      @for ( request of requests(); track request.id ) {
+      <article
+        class="request-card"
+        role="button"
+        tabindex="0"
+        (click)="openRequest(request.id)"
+        (keydown.enter)="openRequest(request.id)"
+        (keydown.space)="openRequest(request.id); $event.preventDefault()"
+      >
+        <div class="request-card__top">
+          <span class="status" [class]="getStatusClass(request.status)">
+            {{ getStatusLabel(request.status) }}
+          </span>
+
+          <span class="request-card__date"> {{ formatDate(request.createdAt) }} </span>
+        </div>
+
+        <div class="request-card__content">
+          <span class="request-card__category"> {{ getCategoryLabel(request.category) }} </span>
+
+          <h2>{{ request.title }}</h2>
+
+          <p>{{ request.description }}</p>
+        </div>
+
+        <div class="request-card__footer">
+          <span>
+            {{ request.proposals.length }} {{ request.proposals.length === 1 ? 'propuesta' :
+            'propuestas' }}
+          </span>
+
+          @if (request.selectedProposal) {
+          <span>
+            Profesional:
+            <strong> {{ request.selectedProposal.workerFullName }} </strong>
+          </span>
+          }
+
+          <span class="request-card__action"> Ver solicitud → </span>
+        </div>
+      </article>
+      }
+    </div>
+    }
+  </div>
+</section>

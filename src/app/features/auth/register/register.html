@@ -1,0 +1,205 @@
+<p style="padding:12px;text-align:center">Registro ficticio y local. No introduzcas contraseñas ni documentos reales.</p><div class="auth-page">
+  <section class="auth-brand-panel">
+    <div class="brand-logo">
+      <lucide-icon [img]="WrenchIcon"></lucide-icon>
+      <span>Fixy</span>
+    </div>
+
+    <div class="brand-content">
+      <h2>Unite a la comunidad Fixy</h2>
+      <p>Encontra profesionales de confianza o consegui nuevos clientes cerca tuyo.</p>
+    </div>
+
+    <span class="copyright">© 2026 Fixy. Todos los derechos reservados.</span>
+  </section>
+
+  <section class="auth-form-panel">
+    <div class="auth-form-container">
+      <!-- FIX 2: currentStep() con parentesis, ahora es signal -->
+      <div class="step-animation">
+        @if (currentStep() === 1) {
+        <div class="step-header">
+          <h1>Crear cuenta</h1>
+          <p class="subtitle">Registrate para comenzar</p>
+        </div>
+        } @if (currentStep() === 2) {
+        <div class="step-header">
+          <h1>Ultimo paso</h1>
+          <p class="subtitle">Verificacion de identidad</p>
+        </div>
+        }
+      </div>
+
+      <div class="register-progress">
+        <div class="progress-steps">
+          <div class="progress-step">
+            <!-- FIX 2: el primer circulo ya no esta siempre activo -->
+            <div class="step-circle" [class.active]="currentStep() === 1">1</div>
+            <span>Paso 1</span>
+          </div>
+
+          <div class="progress-track">
+            <!-- FIX 2: currentStep() -->
+            <div class="progress-fill" [class.step-two]="currentStep() === 2"></div>
+          </div>
+
+          <div class="progress-step">
+            <!-- FIX 2: currentStep() -->
+            <div class="step-circle" [class.active]="currentStep() === 2">2</div>
+            <span>Paso 2</span>
+          </div>
+        </div>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        @if (currentStep() === 1) {
+        <div class="step-animation">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" formControlName="name" placeholder="Nombre" />
+
+            @if (registerForm.controls.name.touched && registerForm.controls.name.invalid) {
+            <span class="error">
+              @if (registerForm.controls.name.hasError('required')) { Ingresa tu nombre }
+              @if (registerForm.controls.name.hasError('minlength')) { Debe tener al menos 2 caracteres }
+              @if (registerForm.controls.name.hasError('pattern')) { Solo se permiten letras }
+            </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Apellido</label>
+            <input type="text" formControlName="surname" placeholder="Apellido" />
+
+            @if (registerForm.controls.surname.touched && registerForm.controls.surname.invalid) {
+            <span class="error">
+              @if (registerForm.controls.surname.hasError('required')) { Ingresa tu apellido }
+              @if (registerForm.controls.surname.hasError('minlength')) { Debe tener al menos 2 caracteres }
+              @if (registerForm.controls.surname.hasError('pattern')) { Solo se permiten letras }
+            </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" formControlName="email" placeholder="Correo electronico" />
+
+            @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
+            <span class="error">
+              @if (registerForm.controls.email.hasError('required')) { Ingresa tu email }
+              @if (registerForm.controls.email.hasError('email')) { Email invalido }
+            </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Contrasena</label>
+            <input type="password" formControlName="password" placeholder="••••••••" />
+
+            @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
+            <span class="error">
+              @if (registerForm.controls.password.hasError('required')) { Ingresa una contrasena }
+              @if (registerForm.controls.password.hasError('minlength')) { Debe tener al menos 8 caracteres }
+              @if (registerForm.controls.password.hasError('pattern')) { Debe incluir mayuscula, minuscula, numero y simbolo }
+            </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Confirmar contrasena</label>
+            <input type="password" formControlName="confirmPassword" placeholder="••••••••" />
+
+            <!-- FIX 5: un solo bloque de error. El validador de grupo setea passwordMismatch. -->
+            @if (registerForm.controls.confirmPassword.touched && registerForm.controls.confirmPassword.invalid) {
+            <span class="error">
+              @if (registerForm.controls.confirmPassword.hasError('required')) { Confirma tu contrasena }
+              @if (registerForm.controls.confirmPassword.hasError('passwordMismatch')) { Las contrasenas no coinciden }
+            </span>
+            }
+          </div>
+
+          <!-- FIX 2 y 6: errorMessage() es signal y ahora es un bloque unico -->
+          @if (errorMessage()) {
+          <span class="error">{{ errorMessage() }}</span>
+          }
+
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="goToStep2()"
+            [disabled]="!isStep1Valid()"
+          >
+            Continuar
+          </button>
+        </div>
+        } @if (currentStep() === 2) {
+        <div class="step-animation">
+          <div class="form-group">
+            <label>Fecha de nacimiento</label>
+            <mat-form-field appearance="outline" class="fixy-date-field">
+  <input
+    matInput
+    placeholder="Fecha de nacimiento"
+    [matDatepicker]="picker"
+    formControlName="birthDate"
+    [min]="minBirthDateObject"
+    [max]="maxBirthDateObject"
+    readonly
+    (focus)="picker.open()"
+    (click)="picker.open()"
+  />
+  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker #picker startView="multi-year"></mat-datepicker>
+</mat-form-field>
+          </div>
+
+          <div class="form-group">
+            <label>Telefono</label>
+            <intl-tel-input
+              formControlName="phoneNumber"
+              [initialCountry]="'ar'"
+              [separateDialCode]="true"
+              [loadUtils]="loadUtils"
+              (validityChange)="onPhoneValidityChange($event)"
+            ></intl-tel-input>
+
+            <!-- FIX 4: usamos el estado real del control, no el booleano paralelo -->
+            @if (registerForm.controls.phoneNumber.touched && registerForm.controls.phoneNumber.hasError('invalidPhone')) {
+            <span class="error">Ingresa un telefono valido</span>
+            }
+          </div>
+
+          <p>Registro ficticio para este navegador. No introduzcas contraseñas ni documentos reales. No se envían correos.</p>
+
+          @if (errorMessage()) {
+          <span class="error">{{ errorMessage() }}</span>
+          }
+
+          <div class="terms-container">
+            <label class="terms-checkbox">
+              <input type="checkbox" formControlName="termsAccepted" />
+              <span>
+                Acepto los
+                <a routerLink="/terms" target="_blank">Terminos y Condiciones</a>
+                y la
+                <a routerLink="/privacy" target="_blank">Politica de Privacidad</a>
+              </span>
+            </label>
+          </div>
+
+          <div class="step-actions">
+            <button type="button" class="btn-secondary" (click)="backToStep1()">← Volver</button>
+            <button type="submit" class="btn-primary" [disabled]="!canSubmit()">Crear cuenta</button>
+          </div>
+        </div>
+        }
+      </form>
+
+      <p class="auth-link">
+        Ya tenes cuenta?
+        <a routerLink="/login">Iniciar sesion</a>
+      </p>
+    </div>
+  </section>
+</div>
+

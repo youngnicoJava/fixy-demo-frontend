@@ -1,0 +1,548 @@
+@use '../../../../shared/styles/variables' as *;
+
+.admin-page {
+  width: min(1200px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 40px 0 80px;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+
+  margin-bottom: 40px;
+}
+
+.eyebrow {
+  color: $primary;
+
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.page-header h1 {
+  margin: 8px 0 10px;
+
+  color: $text-main;
+
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.page-header p {
+  max-width: 650px;
+  margin: 0;
+
+  color: $text-secondary;
+
+  line-height: 1.6;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.primary-button,
+.secondary-button,
+.approve-button,
+.danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 44px;
+  padding: 0 18px;
+
+  border-radius: $radius-md;
+
+  font: inherit;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    transform $transition-fast,
+    opacity $transition-fast,
+    background-color $transition-fast;
+}
+
+.primary-button {
+  border: 0;
+
+  background: $primary;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+}
+
+.secondary-button {
+  border: 1px solid $border;
+
+  background: $white;
+  color: $text-main;
+
+  &:hover:not(:disabled) {
+    background: $background;
+  }
+}
+
+.approve-button {
+  border: 0;
+
+  background: $primary;
+  color: $white;
+
+  flex: 1;
+
+  &:hover:not(:disabled) {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+}
+
+.danger-button {
+  border: 1px solid #fecaca;
+
+  background: #fffafa;
+  color: #b91c1c;
+
+  flex: 1;
+
+  &:hover:not(:disabled) {
+    background: #fef2f2;
+    transform: translateY(-1px);
+  }
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.primary-button lucide-icon,
+.secondary-button lucide-icon,
+.approve-button lucide-icon,
+.danger-button lucide-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+
+  line-height: 0;
+}
+
+/* =========================================================
+   RESULTS
+   ========================================================= */
+
+.results-header {
+  margin-bottom: 16px;
+
+  color: $text-secondary;
+
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* =========================================================
+   WORKERS GRID
+   ========================================================= */
+
+.workers-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.worker-card {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+
+  background: $white;
+  box-shadow: $shadow-card;
+
+  overflow: hidden;
+}
+
+/* =========================================================
+   WORKER CARD HEADER
+   ========================================================= */
+
+.worker-card__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 22px;
+
+  border-bottom: 1px solid $border-light;
+}
+
+.worker-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+
+  flex: 0 0 48px;
+
+  border-radius: 50%;
+
+  background: $background;
+  color: $primary;
+
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.worker-identity {
+  min-width: 0;
+}
+
+.worker-identity h2 {
+  margin: 0 0 5px;
+
+  overflow: hidden;
+
+  color: $text-main;
+
+  font-size: 1.05rem;
+  line-height: 1.25;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.worker-status {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 4px 8px;
+
+  border-radius: 999px;
+
+  background: #fff7ed;
+  color: #c2410c;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* =========================================================
+   WORKER CARD BODY
+   ========================================================= */
+
+.worker-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  padding: 22px;
+
+  flex: 1;
+}
+
+.worker-detail {
+  min-width: 0;
+}
+
+.detail-label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: $text-muted;
+
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.worker-detail p {
+  margin: 0;
+
+  color: $text-secondary;
+
+  font-size: 0.86rem;
+  line-height: 1.55;
+
+  overflow-wrap: anywhere;
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.category {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  background: $background;
+  color: $text-main;
+
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.worker-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  margin-top: auto;
+  padding-top: 4px;
+
+  color: $text-muted;
+
+  font-size: 0.75rem;
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.worker-card__actions {
+  display: flex;
+  gap: 10px;
+
+  padding: 18px 22px;
+
+  border-top: 1px solid $border-light;
+}
+
+/* =========================================================
+   STATES
+   ========================================================= */
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 420px;
+
+  padding: 32px;
+
+  text-align: center;
+
+  p {
+    margin: 14px 0 0;
+
+    color: $text-secondary;
+  }
+}
+
+.state--error h2 {
+  margin: 18px 0 8px;
+
+  color: $text-main;
+}
+
+.state--error p {
+  max-width: 450px;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.state-icon,
+.empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 56px;
+  height: 56px;
+
+  border-radius: 50%;
+
+  background: $background;
+  color: $primary;
+
+  line-height: 0;
+}
+
+.state-icon {
+  background: $danger-light;
+  color: $danger;
+
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 70px 24px;
+
+  border: 1px dashed $border;
+  border-radius: $radius-lg;
+
+  background: $white;
+
+  text-align: center;
+}
+
+.empty-icon {
+  margin-bottom: 18px;
+}
+
+.empty-state h2 {
+  margin: 0 0 8px;
+
+  color: $text-main;
+
+  font-size: 1.2rem;
+}
+
+.empty-state p {
+  max-width: 460px;
+
+  margin: 0;
+
+  color: $text-secondary;
+
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   SPINNERS
+   ========================================================= */
+
+.spinner {
+  width: 34px;
+  height: 34px;
+
+  border: 3px solid $border;
+  border-top-color: $primary;
+
+  border-radius: 50%;
+
+  animation: pending-workers-spin 0.75s linear infinite;
+}
+
+.button-spinner {
+  width: 15px;
+  height: 15px;
+
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: currentColor;
+
+  border-radius: 50%;
+
+  animation: pending-workers-spin 0.65s linear infinite;
+}
+
+.danger-button .button-spinner {
+  border-color: rgba(185, 28, 28, 0.2);
+  border-top-color: #b91c1c;
+}
+
+@keyframes pending-workers-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .admin-page {
+    width: min(100% - 40px, 900px);
+  }
+
+  .workers-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .admin-page {
+    width: min(100% - 32px, 680px);
+    padding-top: 24px;
+  }
+
+  .page-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .secondary-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-page {
+    width: calc(100% - 24px);
+    padding-top: 20px;
+    padding-bottom: 56px;
+  }
+
+  .worker-card__header {
+    padding: 18px;
+  }
+
+  .worker-card__body {
+    padding: 18px;
+  }
+
+  .worker-card__actions {
+    padding: 16px 18px;
+  }
+
+  .worker-card__actions {
+    flex-direction: column;
+  }
+
+  .approve-button,
+  .danger-button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primary-button,
+  .secondary-button,
+  .approve-button,
+  .danger-button {
+    transition: none;
+  }
+
+  .spinner,
+  .button-spinner {
+    animation: none;
+  }
+}

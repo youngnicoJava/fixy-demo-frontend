@@ -1,0 +1,262 @@
+<section class="fx-contract" aria-label="Contratación y pago">
+  @if(loading()){
+  <p role="status">Cargando contratación…</p>
+  } @if(error()){
+  <div class="fx-error" role="alert">
+    {{error()}}
+    <button class="fx-button secondary" type="button" (click)="reload()">Actualizar</button>
+  </div>
+  } @if(summary();as contract){
+  <header class="fx-row">
+    <div>
+      <span class="fx-eyebrow">TU CONTRATACIÓN</span>
+      <h2>{{compact ? 'Presupuesto y pago' : contract.agreement ? 'Acuerdo y pago' : 'Presupuesto del trabajo'}}</h2>
+      <p>{{contract.workerName}}</p>
+    </div>
+    @if(compact){<a class="fx-button secondary" [routerLink]="['/requests',requestId]">Ver contratación</a>}
+  </header>
+  @if(contract.agreement;as agreement){ @if(canPay() && !compact){<app-context-hint
+    hintKey="payment_protection_v1"
+    title="Tu pago queda protegido"
+    text="Confirmar el pago reserva el trabajo. El profesional recibe la liquidación después de completarlo y finalizar el período de protección, si no hay un reclamo que lo impida."
+  />}
+  <article class="fx-card">
+    <div class="fx-row">
+      <h3>Acuerdo de servicio #{{agreement.id}}</h3>
+      <span class="fx-badge">Presupuesto aceptado</span>
+    </div>
+    <p class="fx-amount">{{agreement.totalAmount | currency:'ARS':'symbol':'1.0-2'}}</p>
+    <p>{{agreement.scope}}</p>
+    <details>
+      <summary>Lo que acordaron</summary>
+      <p>
+        Aceptado el {{agreement.acceptedAt | date:'medium'}} · presupuesto #{{agreement.quoteId}}
+      </p>
+      <p>
+        La protección de esta contratación dura
+        {{protectionDays(agreement.protectionPeriodSeconds)}} días desde que confirmás la
+        finalización. El trabajo puede estar completado mientras el dinero sigue protegido.
+      </p>
+    </details>
+    <hr />
+    @if(payment();as currentPayment){
+    <div class="fx-row">
+      <strong>Pago · {{paymentLabel(currentPayment.status)}}</strong
+      ><span>{{currentPayment.amount | currency:'ARS':'symbol':'1.0-2'}}</span>
+    </div>
+    @if(currentPayment.status==='HELD'){
+    <p>
+      Tu dinero permanece protegido. Se liquidará después de completar el trabajo y finalizar la
+      protección, si no hay un reclamo que lo impida.
+    </p>
+    @if(currentPayment.protectionEndsAt){
+    <p>Protección hasta {{currentPayment.protectionEndsAt | date:'medium'}}.</p>
+    } } @if(currentPayment.status==='RELEASED'){
+    <p>La liquidación fue confirmada. El retiro del profesional es una operación separada.</p>
+    } }@else{
+    <p>Presupuesto aceptado. El siguiente paso es pagar para reservar el trabajo.</p>
+    }
+    <div class="fx-actions">
+      @if(canPay()){<button type="button" class="fx-button" [disabled]="busy()" (click)="pay()">
+        {{busy()?'Iniciando…':'Pagar contratación'}}</button
+      >} @if(isClient()){<a class="fx-button secondary" routerLink="/payments">Ver Pagos</a>}
+      <button type="button" class="fx-button secondary" [disabled]="busy()" (click)="reload()">
+        Actualizar estado
+      </button>
+    </div>
+  </article>
+  }@else{ @if(isClient() && !compact){<app-context-hint
+    hintKey="negotiable_quote_v1"
+    title="El chat ayuda; el presupuesto confirma"
+    text="Acordá el alcance con el profesional y aceptá su presupuesto estructurado. Ese importe será el que se pague."
+  />}
+  <p>
+    Conversá para definir el alcance. El precio queda acordado cuando aceptás un presupuesto
+    estructurado, no por un mensaje del chat.
+  </p>
+  @if(canQuote()){<button
+    type="button"
+    class="fx-button"
+    (click)="showQuoteForm.set(!showQuoteForm())"
+  >
+    {{showQuoteForm()?'Cerrar formulario':'Enviar presupuesto'}}</button
+  >} } @if(showQuoteForm() && canQuote()){
+  <form class="fx-card" [formGroup]="quoteForm" (ngSubmit)="sendQuote()">
+    <app-context-hint
+      hintKey="first_quote_v1"
+      title="Un presupuesto claro evita confusiones"
+      text="Separá mano de obra y materiales, y describí qué incluye el trabajo. Si necesitás corregirlo antes de que se acepte, enviá una nueva revisión."
+    />
+    <h3>Presupuesto del trabajo</h3>
+    <p>Indicá el alcance y el importe total. No se factura tiempo automáticamente.</p>
+    <div class="fx-grid">
+      <label
+        >Mano de obra<input
+          type="number"
+          min="0"
+          step="0.01"
+          formControlName="laborAmount" /></label
+      ><label
+        >Materiales<input type="number" min="0" step="0.01" formControlName="materialsAmount"
+      /></label>
+    </div>
+    <label
+      >Qué incluye<textarea rows="3" maxlength="2000" formControlName="scope"></textarea>
+    </label>
+    <strong>Total: {{quoteTotal() | currency:'ARS':'symbol':'1.0-2'}}</strong>
+    <button class="fx-button" type="submit" [disabled]="busy()||quoteForm.invalid||quoteTotal()<=0">
+      Enviar presupuesto
+    </button>
+  </form>
+  } @if(contract.quotes.length){
+  <details [open]="!contract.agreement">
+    <summary>Presupuestos · {{contract.quotes.length}}</summary>
+    @for(quote of contract.quotes;track quote.id){
+    <article class="fx-card">
+      <div class="fx-row">
+        <h3>Presupuesto · revisión {{quote.revision}}</h3>
+        <span class="fx-badge" [attr.data-status]="quote.status">{{quoteLabel(quote.status)}}</span>
+      </div>
+      <p>{{quote.scope}}</p>
+      <dl class="fx-breakdown">
+        <div>
+          <dt>Mano de obra</dt>
+          <dd>{{quote.laborAmount | currency:'ARS':'symbol':'1.0-2'}}</dd>
+        </div>
+        <div>
+          <dt>Materiales</dt>
+          <dd>{{quote.materialsAmount | currency:'ARS':'symbol':'1.0-2'}}</dd>
+        </div>
+        <div>
+          <dt>Total</dt>
+          <dd><strong>{{quote.totalAmount | currency:'ARS':'symbol':'1.0-2'}}</strong></dd>
+        </div>
+      </dl>
+      @if(isClient() && quote.status==='SENT'){
+      <div class="fx-actions">
+        <button class="fx-button" type="button" [disabled]="busy()" (click)="decide(quote.id,true)">
+          Aceptar presupuesto</button
+        ><button
+          class="fx-button danger"
+          type="button"
+          [disabled]="busy()"
+          (click)="decide(quote.id,false)"
+        >
+          Rechazar
+        </button>
+      </div>
+      }
+    </article>
+    }
+  </details>
+  } @if(!contract.agreement && !contract.quotes.length){
+  <details [open]="!!contract.visit">
+    <summary>Visita técnica / diagnóstico</summary>
+    @if(contract.visit;as visit){
+    <p>
+      {{visit.status==='REQUIRED'?'El profesional necesita inspeccionar el
+      problema.':visit.status==='COMPLETED'?'Diagnóstico realizado: ya se puede presupuestar el
+      trabajo.':'Visita coordinada'}}
+    </p>
+    @if(visit.scheduledAt){
+    <p>
+      {{visit.scheduledAt | date:'medium'}} · {{visit.price===0?'Gratuita':(visit.price |
+      currency:'ARS':'symbol':'1.0-2')}}
+    </p>
+    } @if(visit.price && visit.price>0){
+    <p>
+      La visita paga requiere un cobro independiente. Ese flujo todavía no está habilitado; no se
+      incluye en el pago del trabajo.
+    </p>
+    } @if(isWorker() && visit.status==='SCHEDULED' && visit.price===0){<button
+      class="fx-button secondary"
+      type="button"
+      [disabled]="busy()||!visitDue(visit.scheduledAt)"
+      (click)="completeVisit()"
+    >
+      Confirmar diagnóstico realizado</button
+    >} } @if(isWorker() && contract.visit?.status!=='COMPLETED'){
+    <form class="fx-card" [formGroup]="visitForm" (ngSubmit)="scheduleVisit()">
+      <h3>Coordinar visita</h3>
+      <div class="fx-grid">
+        <label>Fecha y hora<input type="datetime-local" formControlName="scheduledAt" /></label
+        ><label
+          >Precio de visita (0 = gratuita)<input
+            type="number"
+            min="0"
+            step="0.01"
+            formControlName="price"
+        /></label>
+      </div>
+      <label>Notas<textarea maxlength="1000" formControlName="notes"></textarea></label
+      ><button class="fx-button secondary" type="submit" [disabled]="busy()||visitForm.invalid">
+        Guardar visita
+      </button>
+    </form>
+    }
+  </details>
+  } @if(!compact && contract.agreement && !aftercareLoading()){ @if(dispute();as claim){
+  <article class="fx-card">
+    <h3>Reclamo de Garantía Fixy #{{claim.id}}</h3>
+    <p>{{claim.description}}</p>
+    <span class="fx-badge"
+      >{{claim.status==='OPEN'?'Abierto':claim.status==='UNDER_REVIEW'?'En
+      revisión':claim.status==='RESOLVED'?'Resuelto':claim.status==='REJECTED'?'Rechazado':'Cancelado'}}</span
+    >
+    <p>
+      Una decisión administrativa no confirma por sí sola una devolución. El estado del pago muestra
+      el movimiento confirmado.
+    </p>
+  </article>
+  } @if(canClaim()){
+  <details>
+    <summary>Necesito ayuda · Garantía Fixy</summary>
+    <form class="fx-card" [formGroup]="claimForm" (ngSubmit)="sendClaim()">
+      <h3>Iniciar un reclamo</h3>
+      <p>
+        Informá un problema relevante del trabajo. Un reclamo válido impide la liquidación mientras
+        se revisa.
+      </p>
+      <label
+        >Motivo<select formControlName="reason">
+          @for(reason of claimReasons;track reason.value){
+          <option [value]="reason.value">{{reason.label}}</option>
+          }
+        </select></label
+      ><label
+        >Qué pasó<textarea
+          rows="3"
+          maxlength="1000"
+          formControlName="description"
+        ></textarea></label
+      ><button class="fx-button secondary" type="submit" [disabled]="busy()||claimForm.invalid">
+        Enviar reclamo
+      </button>
+    </form>
+  </details>
+  } @if(review();as currentReview){
+  <article class="fx-card">
+    <h3>Tu valoración · {{currentReview.rating}} / 5</h3>
+    <p>{{currentReview.comment}}</p>
+  </article>
+  } @else if(isClient() && contract.agreement.status==='COMPLETED'){
+  <details>
+    <summary>Valorar el trabajo</summary>
+    <form class="fx-card" [formGroup]="reviewForm" (ngSubmit)="sendReview()">
+      <h3>¿Cómo fue la contratación?</h3>
+      <label
+        >Puntaje<select formControlName="rating">
+          <option [ngValue]="5">5 · Excelente</option>
+          <option [ngValue]="4">4 · Muy bueno</option>
+          <option [ngValue]="3">3 · Bueno</option>
+          <option [ngValue]="2">2 · Regular</option>
+          <option [ngValue]="1">1 · Malo</option>
+        </select></label
+      ><label>Comentario<textarea maxlength="300" formControlName="comment"></textarea></label
+      ><button class="fx-button" type="submit" [disabled]="busy()||reviewForm.invalid">
+        Publicar valoración
+      </button>
+    </form>
+  </details>
+  } } }
+</section>

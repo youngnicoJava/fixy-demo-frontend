@@ -1,0 +1,74 @@
+<main class="fx-contract fx-payments-page">
+  <header class="fx-row">
+    <div>
+      <span class="fx-eyebrow">TUS CONTRATACIONES</span>
+      <h1>Pagos</h1>
+      <p>Cada trabajo tiene su acuerdo y su pago independiente.</p>
+    </div>
+    <button class="fx-button secondary" type="button" [disabled]="loading()" (click)="load()">
+      Actualizar
+    </button>
+  </header>
+  @if(error()){
+  <p class="fx-error" role="alert">{{error()}}</p>
+  } @if(client()){
+  <nav class="fx-actions" aria-label="Estados de pago">
+    @for(tab of sections;track tab.key){<button
+      type="button"
+      class="fx-button"
+      [class.secondary]="section()!==tab.key"
+      [attr.aria-pressed]="section()===tab.key"
+      (click)="section.set(tab.key)"
+    >
+      {{tab.label}}</button
+    >}
+  </nav>
+  @if(loading()){
+  <p role="status">Cargando pagos…</p>
+  }@else{ @for(item of visible();track item.agreementId??item.payment?.id){
+  <article class="fx-card">
+    <div class="fx-row">
+      <div>
+        <h2>{{item.title}}</h2>
+        <p>{{item.workerName}}</p>
+      </div>
+      <strong class="fx-amount">{{item.totalAmount | currency:'ARS':'symbol':'1.0-2'}}</strong>
+    </div>
+    @if(section()==='PENDING'){
+    <p>
+      {{item.payment?.status==='FAILED'?'El pago no fue confirmado. Podés intentarlo de
+      nuevo.':'Presupuesto aceptado · pendiente de pago'}}
+    </p>
+    } @if(section()==='HELD'){
+    <p>
+      Protegido por Fixy. La liquidación espera la finalización del trabajo y el período de
+      protección.
+    </p>
+    @if(item.payment?.protectionEndsAt){
+    <p>Protección hasta {{item.payment.protectionEndsAt | date:'medium'}}.</p>
+    }} @if(section()==='RELEASED'){
+    <p>Liquidación confirmada al profesional.</p>
+    } @if(section()==='REFUNDED'){
+    <p>Reembolso confirmado por el proveedor.</p>
+    }
+    <div class="fx-actions">
+      @if(section()==='PENDING' && item.agreementId){<button
+        class="fx-button"
+        type="button"
+        [disabled]="paying()!==null"
+        (click)="pay(item)"
+      >
+        {{paying()===item.serviceRequestId?'Iniciando…':'Pagar'}}</button
+      >}<a class="fx-button secondary" [routerLink]="['/requests',item.serviceRequestId]"
+        >Ver contratación</a
+      >
+    </div>
+  </article>
+  }@empty{
+  <section class="fx-card">
+    <h2>No hay pagos en esta sección</h2>
+    <p>Cuando aceptes un presupuesto, tu contratación aparecerá en Pendientes.</p>
+    <a routerLink="/requests/my">Ver mis solicitudes</a>
+  </section>
+  } } }
+</main>

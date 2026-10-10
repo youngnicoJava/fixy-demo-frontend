@@ -1,0 +1,20 @@
+<div class="conversations-layout">
+  <aside class="conversations-sidebar">
+    <app-conversation-list
+      [activeId]="activeConversationId()"
+      (select)="onSelectConversation($event)"
+    />
+  </aside>
+
+  <main class="conversations-main">
+    @if (activeConversationId(); as id) {
+      <app-conversation
+        [conversationId]="id"
+        (messageSent)="onMessageSent()"
+        (back)="onBack()"
+      />
+    } @else {
+      <app-conversations-empty-state />
+    }
+  </main>
+</div>

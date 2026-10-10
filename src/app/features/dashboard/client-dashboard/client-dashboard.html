@@ -1,0 +1,279 @@
+<section class="dashboard">
+  @if (loading()) {
+    <div class="dashboard-state dashboard-state--loading">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Cargando tu dashboard...</p>
+    </div>
+  } @else if (error()) {
+    <div class="dashboard-state dashboard-state--error">
+      <div class="state-icon" aria-hidden="true">!</div>
+      <h2>Error cargando, intenta de nuevo.</h2>
+      <p>Ha ocurrido un problema al obtener tu informacion. Intenta nuevamente.</p>
+      <button type="button" class="primary-button" (click)="retry()">
+        Intentar nuevamente
+      </button>
+    </div>
+  } @else {
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <header class="dashboard-header">
+      <div class="welcome">
+  <span class="eyebrow">DASHBOARD</span>
+
+  <div class="title-wrapper">
+    <h1>Hola de nuevo, {{ firstName() }}.</h1>
+  </div>
+
+  <p>Gestiona tus servicios y encontra profesionales para tus necesidades.</p>
+</div>
+
+      <button type="button" class="primary-button" (click)="createRequest()">
+        <lucide-icon [img]="icons.Plus" [size]="18" [strokeWidth]="2.2" aria-hidden="true" />
+        <span>Nueva solicitud</span>
+      </button>
+    </header>
+
+    <div class="fx-contract"><a class="fx-button secondary" href="/payments">Ver presupuestos aceptados y Pagos</a></div>
+    <!-- =====================================================
+         SUMMARY
+         ===================================================== -->
+
+    <section class="stats-grid" aria-label="Resumen de actividad">
+      <article class="stat-card">
+        <div class="stat-icon">
+          <lucide-icon
+            [img]="icons.ClipboardList"
+            [size]="21"
+            [strokeWidth]="2"
+            aria-hidden="true"
+          />
+        </div>
+        <div>
+          <span class="stat-label">Solicitudes activas</span>
+          <strong class="stat-value">{{ activeRequests().length }}</strong>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon">
+          <lucide-icon
+            [img]="icons.MessageCircle"
+            [size]="21"
+            [strokeWidth]="2"
+            aria-hidden="true"
+          />
+        </div>
+        <div>
+          <span class="stat-label">Con propuestas</span>
+          <strong class="stat-value">{{ pendingRequests().length }}</strong>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon">
+          <lucide-icon [img]="icons.Wrench" [size]="21" [strokeWidth]="2" aria-hidden="true" />
+        </div>
+        <div>
+          <span class="stat-label">Servicios completados</span>
+          <strong class="stat-value">{{ completedRequests().length }}</strong>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-icon">
+          <lucide-icon [img]="icons.MapPin" [size]="21" [strokeWidth]="2" aria-hidden="true" />
+        </div>
+        <div>
+          <span class="stat-label">Direccion principal</span>
+          <strong class="stat-value stat-value--small">
+            {{ profile()?.activeAddress?.label || 'Sin configurar' }}
+          </strong>
+        </div>
+      </article>
+    </section>
+
+    <!-- =====================================================
+         ACTIVE REQUESTS
+         ===================================================== -->
+
+    <section class="dashboard-section">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">SERVICIOS</span>
+          <h2>Mis solicitudes</h2>
+        </div>
+
+        @if (requests().length > 0) {
+          <button type="button" class="text-button" (click)="viewAllRequests()">
+            Ver todas
+          </button>
+        }
+      </div>
+
+      @if (activeRequests().length > 0) {
+        <div class="requests-grid">
+          @for (request of activeRequests(); track request.id) {
+            <article
+              class="request-card"
+              tabindex="0"
+              role="button"
+              (click)="openRequest(request.id)"
+              (keydown.enter)="openRequest(request.id)"
+              (keydown.space)="openRequest(request.id)"
+            >
+              <div class="request-card__top">
+                <span class="category">{{ getCategoryLabel(request.category) }}</span>
+
+                <!-- FIX 1: usamos STATUS_LABELS en vez de getStatusLabel() -->
+                <span class="status" [attr.data-status]="request.status">
+                  {{ STATUS_LABELS[request.status] }}
+                </span>
+              </div>
+
+              <h3>{{ request.title }}</h3>
+              <p class="description">{{ request.description }}</p>
+
+              <div class="request-card__meta">
+                <span>
+                  <lucide-icon
+                    [img]="icons.MapPin"
+                    [size]="15"
+                    [strokeWidth]="2"
+                    aria-hidden="true"
+                  />
+                  {{ request.address }}
+                </span>
+
+                <span>
+                  <lucide-icon
+                    [img]="icons.MessageCircle"
+                    [size]="15"
+                    [strokeWidth]="2"
+                    aria-hidden="true"
+                  />
+                  {{ request.proposals.length }}
+                  {{ request.proposals.length === 1 ? 'propuesta' : 'propuestas' }}
+                </span>
+              </div>
+
+              @if (request.selectedProposal) {
+                <div class="selected-worker">
+                  <div class="worker-avatar">
+                    {{ request.selectedProposal.workerFullName.charAt(0) }}
+                  </div>
+
+                  <div class="worker-info">
+                    <span>Profesional seleccionado</span>
+                    <strong>{{ request.selectedProposal.workerFullName }}</strong>
+                  </div>
+
+                  <lucide-icon
+                    class="arrow"
+                    [img]="icons.ArrowRight"
+                    [size]="19"
+                    [strokeWidth]="2"
+                    aria-hidden="true"
+                  />
+                </div>
+              }
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <lucide-icon [img]="icons.Wrench" [size]="26" [strokeWidth]="1.9" aria-hidden="true" />
+          </div>
+
+          <h3>No tenes solicitudes activas</h3>
+          <p>Publica una solicitud y encontra un profesional para resolver lo que necesitas.</p>
+
+          <button type="button" class="primary-button" (click)="createRequest()">
+            <lucide-icon [img]="icons.Plus" [size]="18" [strokeWidth]="2.2" aria-hidden="true" />
+            <span>Publicar solicitud</span>
+          </button>
+        </div>
+      }
+    </section>
+
+    <!-- =====================================================
+         LATEST REQUEST
+         ===================================================== -->
+
+    @if (latestRequest(); as latest) {
+      @if (!activeRequests().includes(latest)) {
+        <section class="dashboard-section">
+          <div class="section-header">
+            <div>
+              <span class="eyebrow">ACTIVIDAD RECIENTE</span>
+              <h2>Ultima solicitud</h2>
+            </div>
+          </div>
+
+          <article
+            class="latest-request"
+            tabindex="0"
+            role="button"
+            (click)="openRequest(latest.id)"
+            (keydown.enter)="openRequest(latest.id)"
+            (keydown.space)="openRequest(latest.id)"
+          >
+            <div class="latest-request__content">
+              <span class="category">{{ getCategoryLabel(latest.category) }}</span>
+              <h3>{{ latest.title }}</h3>
+              <p>{{ latest.description }}</p>
+
+              <!-- FIX 1: STATUS_LABELS -->
+              <span class="status" [attr.data-status]="latest.status">
+                {{ STATUS_LABELS[latest.status] }}
+              </span>
+            </div>
+
+            <lucide-icon
+              class="latest-request__arrow"
+              [img]="icons.ArrowRight"
+              [size]="21"
+              [strokeWidth]="2"
+              aria-hidden="true"
+            />
+          </article>
+        </section>
+      }
+    }
+
+    <!-- =====================================================
+         QUICK ACTIONS
+         ===================================================== -->
+
+    <section class="quick-actions">
+      <button type="button" class="quick-action" (click)="createRequest()">
+        <span class="quick-action__icon">
+          <lucide-icon [img]="icons.Plus" [size]="21" [strokeWidth]="2" aria-hidden="true" />
+        </span>
+        <div>
+          <strong>Publicar solicitud</strong>
+          <span>Contale a Fixy que necesitas</span>
+        </div>
+      </button>
+
+      <button type="button" class="quick-action" (click)="viewAllRequests()">
+        <span class="quick-action__icon">
+          <lucide-icon
+            [img]="icons.ClipboardList"
+            [size]="21"
+            [strokeWidth]="2"
+            aria-hidden="true"
+          />
+        </span>
+        <div>
+          <strong>Ver mis solicitudes</strong>
+          <span>Consulta el estado de tus servicios</span>
+        </div>
+      </button>
+    </section>
+  }
+</section>
+
+<app-footer></app-footer>

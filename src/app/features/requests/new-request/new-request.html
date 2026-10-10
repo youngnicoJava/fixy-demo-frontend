@@ -1,0 +1,98 @@
+<section class="new-request">
+  <div class="new-request__container">
+    <header class="new-request__header">
+      <div class="header-content">
+        <span class="eyebrow">NUEVA SOLICITUD</span>
+
+        <h1>¿Qué problema necesitas resolver?</h1>
+
+        <p>Contanos qué problema tenés y encontraremos profesionales que puedan ayudarte.</p>
+      </div>
+    </header>
+
+    <form class="request-form" [formGroup]="requestForm" (ngSubmit)="submit()" novalidate>
+      <!-- TÍTULO -->
+      <div class="form-field">
+        <label for="title"> ¿Qué necesitás hacer? </label>
+
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          maxlength="100"
+          autocomplete="off"
+          placeholder="Ej. Necesito reparar una pérdida de agua"
+        />
+
+        @if (requestForm.controls.title.invalid && requestForm.controls.title.touched) {
+          <span class="field-error">
+            @if (requestForm.controls.title.hasError('required')) {
+              El título es obligatorio.
+            } @else if (requestForm.controls.title.hasError('minlength')) {
+              El título debe tener al menos 5 caracteres.
+            } @else {
+              El título no puede superar los 100 caracteres.
+            }
+          </span>
+        }
+      </div>
+
+      <!-- CATEGORÍA -->
+      <div class="form-field">
+        <label for="category"> Categoría </label>
+
+        <select id="category" formControlName="category">
+          <option [ngValue]="null">Seleccioná una categoría</option>
+
+          @for (category of categories; track category) {
+            <option [value]="category">
+              {{ category.toLowerCase().replaceAll('_', ' ') }}
+            </option>
+          }
+        </select>
+
+        @if (requestForm.controls.category.invalid && requestForm.controls.category.touched) {
+          <span class="field-error"> Seleccioná una categoría. </span>
+        }
+      </div>
+
+      <!-- DESCRIPCIÓN -->
+      <div class="form-field">
+        <label for="description"> Contanos un poco más </label>
+
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="7"
+          maxlength="500"
+          placeholder="Describí el problema, qué necesitás y cualquier detalle que pueda ayudar al profesional..."
+        ></textarea>
+
+        <div class="field-footer">
+          @if (requestForm.controls.description.invalid && requestForm.controls.description.touched) {
+            <span class="field-error">
+              @if (requestForm.controls.description.hasError('required')) {
+                La descripción es obligatoria.
+              } @else if (requestForm.controls.description.hasError('minlength')) {
+                La descripción debe tener al menos 10 caracteres.
+              } @else {
+                La descripción no puede superar los 500 caracteres.
+              }
+            </span>
+          }
+
+          <span class="character-count">
+            {{ requestForm.controls.description.value.length }}/500
+          </span>
+        </div>
+      </div>
+
+      <!-- ACCIONES -->
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="cancel()">Cancelar</button>
+
+        <button type="submit" class="primary-button">Continuar</button>
+      </div>
+    </form>
+  </div>
+</section>

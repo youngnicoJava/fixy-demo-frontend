@@ -1,0 +1,435 @@
+@if (loading()) {
+<main class="service-detail-page">
+  <div class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Cargando servicio...</p>
+  </div>
+</main>
+} @else if (errorMessage()) {
+<main class="service-detail-page">
+  <section class="state-card">
+    <div class="state-icon state-icon--error">
+      <lucide-icon [img]="icons.Wrench"></lucide-icon>
+    </div>
+
+    <h1>No pudimos cargar este servicio</h1>
+    <p>{{ errorMessage() }}</p>
+
+    <button type="button" class="secondary-button" (click)="goBack()">
+      <lucide-icon [img]="icons.ArrowLeft"></lucide-icon>
+      Volver
+    </button>
+  </section>
+</main>
+} @else if (offering(); as service) {
+
+<main class="service-detail-page">
+  <!-- =====================================================
+       TOP BAR
+       ===================================================== -->
+
+  <button type="button" class="back-link" (click)="goBack()">
+    <lucide-icon [img]="icons.ArrowLeft"></lucide-icon>
+    Volver
+  </button>
+
+  <!-- =====================================================
+       SERVICE
+       ===================================================== -->
+
+  <section class="service-layout">
+    <!-- ===================================================
+         GALLERY
+         =================================================== -->
+
+    <div class="gallery">
+      <div class="main-image">
+        @if (selectedImage()) {
+
+        <img [src]="selectedImage()!" [alt]="service.title" />
+
+        @if (imageCount() > 1) {
+        <button
+          type="button"
+          class="gallery-arrow gallery-arrow--left"
+          aria-label="Imagen anterior"
+          (click)="previousImage()"
+        >
+          <lucide-icon [img]="icons.ChevronLeft"></lucide-icon>
+        </button>
+
+        <button
+          type="button"
+          class="gallery-arrow gallery-arrow--right"
+          aria-label="Imagen siguiente"
+          (click)="nextImage()"
+        >
+          <lucide-icon [img]="icons.ChevronRight"></lucide-icon>
+        </button>
+        }
+
+        } @else {
+
+        <div class="image-placeholder">
+          <lucide-icon [img]="icons.Wrench"></lucide-icon>
+          <span>Este servicio no tiene imágenes</span>
+        </div>
+
+        }
+      </div>
+
+      @if (imageCount() > 1) {
+
+      <div class="thumbnails">
+        @for (image of service.imageUrls; track image; let i = $index) {
+
+        <button
+          type="button"
+          class="thumbnail"
+          [class.thumbnail--active]="selectedImageIndex() === i"
+          (click)="selectImage(i)"
+        >
+          <img
+            [src]="image"
+            [alt]="service.title + ' imagen ' + (i + 1)"
+          />
+        </button>
+
+        }
+      </div>
+
+      }
+    </div>
+
+    <!-- ===================================================
+         INFORMATION
+         =================================================== -->
+
+    <div class="service-info">
+      <!-- Category -->
+
+      <div class="category-label">
+        {{ categoryLabel() }}
+      </div>
+
+      <!-- Title -->
+
+      <div class="title-area">
+        <h1>{{ service.title }}</h1>
+
+        @if (service.workerVerified) {
+
+        <span class="verified-badge">
+          <lucide-icon [img]="icons.BadgeCheck"></lucide-icon>
+          Verificado
+        </span>
+
+        }
+
+        <button
+          type="button"
+          class="favorite-button"
+          [class.active]="isFavorite(service.id)"
+          (click)="toggleFavorite(service.id, $event)"
+          [attr.aria-label]="
+            isFavorite(service.id)
+              ? 'Quitar de favoritos'
+              : 'Agregar a favoritos'
+          "
+        >
+          <lucide-icon [img]="icons.Heart" [size]="19"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Rating -->
+
+      <div class="rating-row">
+        <lucide-icon [img]="icons.Star"></lucide-icon>
+
+        @if (service.workerRating !== null) {
+
+        <strong>
+          {{ service.workerRating | number:'1.1-1' }}
+        </strong>
+
+        <span>
+          Calificación del profesional
+        </span>
+
+        } @else {
+
+        <span>
+          Profesional sin calificaciones todavía
+        </span>
+
+        }
+      </div>
+
+      <!-- Price -->
+
+      <div class="price-block">
+        <span class="price">
+          {{ formattedPrice() }}
+        </span>
+
+        @if (service.priceType === PriceType.FIXED) {
+
+        <span class="price-description">
+          Precio del servicio
+        </span>
+
+        } @else if (service.priceType === PriceType.NEGOTIABLE) {
+
+        <span class="price-description">
+          Precio a convenir con el profesional
+        </span>
+
+        } @else {
+
+        <span class="price-description">
+          Valor estimado por hora
+        </span>
+
+        }
+      </div>
+
+      @if(!isOwnOffering()){<div class="fx-contract"><p>Esta publicación es una referencia comercial. Para contratar, publicá tu necesidad, seleccioná al profesional y confirmá un presupuesto antes de pagar.</p><button class="fx-button secondary" type="button" (click)="createServiceRequest()">Crear solicitud para este servicio</button></div>}
+      <!-- CTA -->
+
+      <div class="action-card">
+        <div class="action-card__content">
+          <strong>
+            ¿Necesitás este servicio?
+          </strong>
+
+          <span>
+            Consultá con el profesional y coordiná los detalles.
+          </span>
+        </div>
+
+        <button
+          type="button"
+          class="primary-button"
+          [disabled]="contacting() || isOwnOffering()"
+          (click)="contactWorkerByMessaging()"
+        >
+          <lucide-icon [img]="icons.MessageCircle"></lucide-icon>
+          {{isOwnOffering()?'Tu publicación':contacting()?'Abriendo…':'Consultar servicio'}}
+        </button>
+      </div>
+
+      @if(contactError()){<p class="contact-error" role="alert">{{contactError()}}</p>}
+      <!-- =================================================
+           WORKER
+           ================================================= -->
+
+      <article class="worker-card">
+        <div class="worker-card__top">
+          <div class="worker-avatar">
+            @if (service.workerProfilePhotoUrl) {
+
+            <img
+              [src]="service.workerProfilePhotoUrl"
+              [alt]="service.workerFullName"
+            />
+
+            } @else {
+
+            <lucide-icon [img]="icons.UserRound"></lucide-icon>
+
+            }
+          </div>
+
+          <div class="worker-main">
+            <span class="worker-label">
+              Publicado por
+            </span>
+
+            <h2>
+              {{ service.workerFullName }}
+            </h2>
+
+            @if (service.workerVerified) {
+
+            <span class="worker-verified">
+              <lucide-icon [img]="icons.BadgeCheck"></lucide-icon>
+              Profesional verificado
+            </span>
+
+            }
+
+          </div>
+        </div>
+
+        @if (service.workerRating !== null) {
+
+        <div class="worker-rating">
+          <lucide-icon [img]="icons.Star"></lucide-icon>
+
+          <strong>
+            {{ service.workerRating | number:'1.1-1' }}
+          </strong>
+
+          <span>
+            Calificación
+          </span>
+        </div>
+
+        }
+
+        <button
+          type="button"
+          class="profile-button"
+          (click)="openWorkerProfile()"
+        >
+          Ver perfil profesional
+        </button>
+      </article>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       DESCRIPTION
+       ===================================================== -->
+
+  <section class="description-card">
+    <div class="section-heading">
+      <span class="section-eyebrow">
+        SOBRE EL SERVICIO
+      </span>
+
+      <h2>
+        Descripción
+      </h2>
+    </div>
+
+    <p>
+      {{ service.description }}
+    </p>
+  </section>
+
+  <!-- =====================================================
+       REVIEWS
+       ===================================================== -->
+
+  <section class="reviews-section">
+    <div class="section-heading">
+      <span class="section-eyebrow">
+        OPINIONES DE CLIENTES
+      </span>
+
+      <h2>
+        Experiencias con este profesional
+      </h2>
+
+      @if (service.workerRating !== null) {
+
+      <div class="reviews-summary">
+        <lucide-icon [img]="icons.Star"></lucide-icon>
+
+        <strong>
+          {{ service.workerRating | number:'1.1-1' }}
+        </strong>
+
+        <span>
+          {{ reviewCount() }}
+          {{ reviewCount() === 1 ? 'reseña' : 'reseñas' }}
+        </span>
+      </div>
+
+      }
+    </div>
+
+    @if (reviewsLoading()) {
+
+    <div class="reviews-loading">
+      <div class="reviews-spinner"></div>
+
+      <span>
+        Cargando opiniones...
+      </span>
+    </div>
+
+    } @else if (reviewsError()) {
+
+    <div class="reviews-empty">
+      <lucide-icon [img]="icons.MessageCircle"></lucide-icon>
+
+      <strong>
+        No pudimos cargar las opiniones
+      </strong>
+
+      <p>
+        Intentá nuevamente más tarde.
+      </p>
+    </div>
+
+    } @else if (hasReviews()) {
+
+    <div class="reviews-list">
+      @for (review of reviews(); track review.id) {
+
+      <article class="review-card">
+        <div class="review-card__top">
+
+          <div class="review-avatar">
+            <lucide-icon [img]="icons.UserRound"></lucide-icon>
+          </div>
+
+          <div class="review-author">
+            <strong>
+              Cliente
+            </strong>
+
+            <span>
+              {{ review.createdAt | date:'d MMM yyyy' }}
+            </span>
+          </div>
+
+          <div class="review-rating">
+            @for (star of [1, 2, 3, 4, 5]; track star) {
+
+            <lucide-icon
+              [img]="icons.Star"
+              [class.filled]="star <= review.rating"
+            ></lucide-icon>
+
+            }
+          </div>
+
+        </div>
+
+        @if (review.comment) {
+
+        <p class="review-comment">
+          “{{ review.comment }}”
+        </p>
+
+        }
+
+      </article>
+
+      }
+    </div>
+
+    } @else {
+
+    <div class="reviews-empty">
+      <lucide-icon [img]="icons.Star"></lucide-icon>
+
+      <strong>
+        Todavía no hay opiniones
+      </strong>
+
+      <p>
+        Las opiniones aparecen cuando clientes que completaron
+        un servicio con este profesional comparten su experiencia.
+      </p>
+    </div>
+
+    }
+
+  </section>
+</main>
+
+}
