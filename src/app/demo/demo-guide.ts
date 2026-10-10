@@ -7,6 +7,8 @@ import {
   input,
   signal,
   PLATFORM_ID,
+  ElementRef,
+  viewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
@@ -19,57 +21,98 @@ import { pageGuide } from './demo-guide-model';
   standalone: true,
   imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '[style.padding-top]': 'navbarFixed() ? "var(--fixy-navbar-height, 112px)" : "0"' },
-  template: `<section class="guide" aria-label="Guía interactiva de la demo">
-    @if (hidden()) {
-      <button class="reopen" type="button" (click)="reopen()">
-        Cómo usar esta pantalla · Abrir guía
-      </button>
-    } @else {
-      <div class="heading">
-        <div>
-          <span class="eyebrow">Guía de demo · sin backend</span>
-          <h2>{{ guide().title }}</h2>
+  host: {
+    '[style.--guide-top]':
+      'navbarFixed() ? "calc(var(--fixy-navbar-height, 112px) + 16px)" : "16px"',
+    '(document:keydown.escape)': 'closeOnEscape()',
+  },
+  template: `<button
+      #guideToggle
+      class="guide-toggle"
+      type="button"
+      (click)="hidden() ? reopen() : dismiss()"
+      [attr.aria-expanded]="!hidden()"
+      aria-controls="demo-guide-panel"
+      [attr.aria-label]="
+        hidden() ? 'Cómo usar esta pantalla · Abrir guía' : 'Cerrar guía de esta pantalla'
+      "
+    >
+      <span aria-hidden="true">{{ hidden() ? '?' : '×' }}</span> Guía de demo
+    </button>
+    @if (!hidden()) {
+      <aside id="demo-guide-panel" class="guide" aria-label="Guía interactiva de la demo">
+        <div class="heading">
+          <div>
+            <span class="eyebrow">Guía de demo · sin backend</span>
+            <h2>{{ guide().title }}</h2>
+          </div>
+          <button type="button" (click)="dismiss()" aria-label="Cerrar guía de esta pantalla">
+            Cerrar guía
+          </button>
         </div>
-        <button type="button" (click)="dismiss()" aria-label="Cerrar guía de esta pantalla">
-          Cerrar guía
-        </button>
-      </div>
-      <div class="instruction" aria-live="polite" aria-atomic="true">
-        <p class="progress">Paso {{ index() + 1 }} de {{ guide().steps.length }}</p>
-        <h3>{{ current().title }}</h3>
-        <p>{{ current().text }}</p>
-      </div>
-      <div class="actions">
-        <button type="button" (click)="previous()" [disabled]="index() === 0">Anterior</button
-        ><button type="button" (click)="advance()">
-          {{ index() < guide().steps.length - 1 ? 'Siguiente consejo' : 'Entendido' }}</button
-        ><a routerLink="/demo-info">Info · qué es Fixy</a>
-      </div>
-      <small
-        >Esta guía explica los pasos; las acciones se realizan en los controles de la
-        pantalla.</small
-      >
-    }
-  </section>`,
+        <div class="instruction" aria-live="polite" aria-atomic="true">
+          <p class="progress">Paso {{ index() + 1 }} de {{ guide().steps.length }}</p>
+          <h3>{{ current().title }}</h3>
+          <p>{{ current().text }}</p>
+        </div>
+        <div class="actions">
+          <button type="button" (click)="previous()" [disabled]="index() === 0">Anterior</button
+          ><button type="button" (click)="advance()">
+            {{ index() < guide().steps.length - 1 ? 'Siguiente consejo' : 'Entendido' }}</button
+          ><a routerLink="/demo-info">Info · qué es Fixy</a>
+        </div>
+        <small
+          >Esta guía explica los pasos; las acciones se realizan en los controles de la
+          pantalla.</small
+        >
+      </aside>
+    }`,
   styles: [
     `
       :host {
-        display: block;
-        width: 100%;
-        box-sizing: border-box;
+        display: contents;
+      }
+      .guide-toggle {
+        position: fixed;
+        left: 16px;
+        bottom: 20px;
+        z-index: 1100;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 48px;
+        padding: 10px 16px;
+        border: 1px solid #dcd6f5;
+        border-radius: 14px;
+        background: #24127a;
+        color: white;
+        box-shadow: 0 6px 20px #24127a24;
+        font:
+          600 14px/1.4 Inter,
+          Arial,
+          sans-serif;
+        cursor: pointer;
+      }
+      .guide-toggle span {
+        font-size: 22px;
+        line-height: 1;
       }
       .guide {
-        margin: 16px auto 8px;
-        padding: 18px 22px;
+        position: fixed;
+        top: var(--guide-top, 16px);
+        bottom: 84px;
+        left: 16px;
+        z-index: 1100;
+        width: min(360px, calc(100vw - 32px));
+        padding: 22px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        overscroll-behavior: contain;
         border: 1px solid #dcd6f5;
-        border-left: 4px solid #3824ac;
         border-radius: 16px;
         background: #f7f5ff;
-        max-width: 1080px;
-        width: calc(100% - 32px);
-        box-sizing: border-box;
         color: #24213c;
+        box-shadow: 0 12px 36px #24127a26;
         font:
           14px/1.55 Inter,
           Arial,
@@ -77,9 +120,9 @@ import { pageGuide } from './demo-guide-model';
       }
       .heading {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
+        gap: 8px;
       }
       .eyebrow,
       .progress {
@@ -100,14 +143,18 @@ import { pageGuide } from './demo-guide-model';
       p {
         margin: 4px 0 10px;
       }
+      .instruction {
+        margin-top: 24px;
+      }
       .actions {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
         align-items: center;
-        margin: 12px 0;
+        margin: 20px 0 12px;
       }
-      button {
+      .guide button {
+        min-height: 44px;
         padding: 7px 12px;
         border: 1px solid #b8acd9;
         border-radius: 9px;
@@ -129,25 +176,19 @@ import { pageGuide } from './demo-guide-model';
         color: #3824ac;
         font-weight: 600;
       }
-      .reopen {
-        border: 0;
-        background: transparent;
-        padding: 0;
-      }
       .guide small {
         font-size: 11px;
         color: #6c6381;
       }
       @media (max-width: 640px) {
         .guide {
-          padding: 14px;
-          width: calc(100% - 24px);
+          left: 12px;
+          width: min(360px, calc(100vw - 24px));
+          padding: 18px;
         }
-        .heading {
-          flex-wrap: wrap;
-        }
-        h2 {
-          font-size: 17px;
+        .guide-toggle {
+          left: 12px;
+          bottom: 16px;
         }
       }
     `,
@@ -165,7 +206,9 @@ export class DemoGuideComponent {
     this.store.revision();
     return pageGuide(this.url(), this.store.state);
   });
-  readonly hidden = computed(() => !!this.dismissed()[this.guide().key]);
+  private readonly opened = signal(false);
+  private readonly toggleButton = viewChild<ElementRef<HTMLButtonElement>>('guideToggle');
+  readonly hidden = computed(() => !this.opened() || !!this.dismissed()[this.guide().key]);
   readonly index = computed(() => Math.min(this.position(), this.guide().steps.length - 1));
   readonly current = computed(() => this.guide().steps[this.index()]);
   constructor() {
@@ -189,10 +232,16 @@ export class DemoGuideComponent {
     if (this.index() < this.guide().steps.length - 1) this.position.update((v) => v + 1);
     else this.dismiss();
   }
+  closeOnEscape() {
+    if (!this.hidden()) this.dismiss();
+  }
   dismiss() {
+    this.opened.set(false);
+    this.toggleButton()?.nativeElement.focus();
     this.save(true);
   }
   reopen() {
+    this.opened.set(true);
     this.position.set(0);
     this.save(false);
   }

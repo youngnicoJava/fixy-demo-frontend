@@ -109,7 +109,7 @@ La demo usa salida SPA, sin SSR/hydration ni Functions. Bun se usa para instalac
 
 El navbar identifica la aplicación como **Fixy (demo)**. La barra superior y las ayudas recuerdan que funciona sin backend.
 
-Cada pantalla principal tiene consejos navegables con Anterior/Siguiente/Entendido. El detalle adapta la ayuda al rol y a los datos locales (propuesta, visita, presupuesto, pago, trabajo y review), sin ejecutar acciones automáticamente. Cerrar la guía persiste por pantalla; Abrir guía permite recuperarla. Restablecer demo elimina también estas preferencias.
+La guía se abre desde el toggle fijo abajo a la izquierda y aparece como panel lateral desplazable. Inicia cerrada y se cierra desde el toggle, Cerrar guía o Escape. Cada pantalla principal tiene consejos navegables con Anterior/Siguiente/Entendido. El detalle adapta la ayuda al rol y a los datos locales (propuesta, visita, presupuesto, pago, trabajo y review), sin ejecutar acciones automáticamente. Cerrar la guía persiste por pantalla; Abrir guía permite recuperarla. Restablecer demo elimina también estas preferencias.
 
 `/demo-info`, accesible desde **Info**, explica el recorrido, almacenamiento local, límites de la simulación y responsabilidades del backend real, y enlaza **Fixy README** en https://github.com/youngnicoJava/fixy-readme#readme.
 

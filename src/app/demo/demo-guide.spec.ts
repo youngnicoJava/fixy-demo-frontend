@@ -18,6 +18,13 @@ describe('demo guide controls', () => {
     const guide = fixture.componentInstance,
       store = TestBed.inject(DemoStore);
     const before = JSON.stringify(store.state);
+    expect(guide.hidden()).toBe(true);
+    guide.reopen();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.guide-toggle').getAttribute('aria-expanded')).toBe(
+      'true',
+    );
+    expect(fixture.nativeElement.querySelector('#demo-guide-panel')).not.toBeNull();
     guide.advance();
     expect(guide.index()).toBe(1);
     guide.dismiss();
