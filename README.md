@@ -2,7 +2,25 @@
 
 Demo interactiva independiente del frontend Angular de Fixy. No requiere Spring, Payment/Go, PostgreSQL ni Kafka. Todas las operaciones de esta demo son locales y ficticias.
 
-## Ejecutar
+## Ejecutar con Docker
+
+Requiere Docker con Compose. Node y Bun se usan dentro del contenedor; no hace falta instalarlos localmente.
+
+```sh
+docker compose up --build -d
+```
+
+Abrir http://localhost:4300. La imagen compila Angular y sirve la demo estática con Nginx, incluyendo fallback para rutas profundas como `/requests/103`. No levanta backend ni servicios de pago: el recorrido sigue siendo una simulación local en el navegador.
+
+Para aplicar cambios, repetir el comando anterior. Para detener:
+
+```sh
+docker compose down
+```
+
+El estado se conserva en localStorage del navegador, no en volúmenes Docker. GitHub Pages y Vercel mantienen sus builds actuales.
+
+## Desarrollo sin Docker
 
 Requisitos: Bun 1.3.14 y Node compatible con Angular 22 (`^22.22.3` o `^24.15.0`).
 

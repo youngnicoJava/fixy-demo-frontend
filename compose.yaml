@@ -1,0 +1,5 @@
+services:
+  fixy-demo:
+    build: .
+    ports:
+      - "4300:80"

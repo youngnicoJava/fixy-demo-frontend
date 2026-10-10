@@ -1,0 +1,11 @@
+node_modules
+dist
+.angular
+.git
+.github
+.env
+.env.*
+*.log
+*-result.txt
+original-*.txt
+original-*.json
