@@ -99,7 +99,7 @@
       <div class="social-links">
         @for(social of socialLinks; track social.name) {
         <a
-          [href]="social.url"
+          [routerLink]="social.url"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="{{ social.name }}"
